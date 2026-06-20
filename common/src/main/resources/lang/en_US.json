@@ -6,6 +6,23 @@
     "update-failed": "<yellow>Failed to fetch latest version, error: <error>"
   },
   "commands": {
+    "killcash": {
+      "help": "\n<green>--- KillCash Help ---</green>\n<gold>/killcash stats [player]</gold> - <gray>View player statistics</gray>\n<gold>/killcash balance [player]</gold> - <gray>View player economy balance</gray>\n<gold>/killcash reload</gold> - <gray>Reload configuration and translations</gray>\n<gold>/killcash dump</gold> - <gray>Generate plugin debug log</gray>\n",
+      "only-players": "<red>This command can only be executed by players.</red>",
+      "stats": {
+        "self": "\n<green>--- Your PvP Statistics ---</green>\n<gray>Balance:</gray> <gold>$<balance></gold>\n<gray>Kills:</gray> <white><kills></white>\n<gray>Deaths:</gray> <white><deaths></white>\n<gray>Killstreak:</gray> <white><streak></white>\n",
+        "other-online": "\n<green>--- <player>'s PvP Statistics ---</green>\n<gray>Balance:</gray> <gold>$<balance></gold>\n<gray>Kills:</gray> <white><kills></white>\n<gray>Deaths:</gray> <white><deaths></white>\n<gray>Killstreak:</gray> <white><streak></white>\n",
+        "other-offline": "\n<green>--- <player>'s PvP Statistics (Offline) ---</green>\n<gray>Balance:</gray> <gold>$<balance></gold>\n<gray>Kills:</gray> <white>N/A</white>\n<gray>Deaths:</gray> <white>N/A</white>\n<gray>Killstreak:</gray> <white>N/A</white>\n",
+        "player-not-found": "<red>Player <white><player></white> could not be found.</red>"
+      },
+      "balance": {
+        "self": "<green>Your current balance is <gold>$<balance></gold>.</green>",
+        "other": "<green><player>'s current balance is <gold>$<balance></gold>.</green>"
+      },
+      "reload": {
+        "success": "<green>Successfully reloaded KillCash configuration and translations!</green>"
+      }
+    },
     "translation": {
       "help": "\n<white>Translations subcommands:\n  <dark_gray>• <white>reload: <gray><i>Reloads the translation files.\n  <dark_gray>• <white>test <node>: <gray><i>Test a translation.\n",
       "reloaded": "<green>Successfully reloaded translations!",
