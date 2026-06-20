@@ -20,7 +20,7 @@ public class PaperMessageService implements MessageService {
 
     @Override
     public void sendMessage(Player player, String translationKey, Map<String, String> placeholders) {
-        ColorParser parser = ColorParser.of(Translation.of(translationKey));
+        var parser = ColorParser.of(Translation.of(translationKey));
         for (Map.Entry<String, String> entry : placeholders.entrySet()) {
             parser.with(entry.getKey(), entry.getValue());
         }
