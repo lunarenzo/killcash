@@ -11,13 +11,13 @@ on:
       java:
         description: "The Java version the workflow should use"
         required: false
-        type: number
-        default: 25
+        type: string
+        default: '25'
       retention_days:
         description: "Artifact retention days (default: 7)"
         required: false
-        type: number
-        default: 7
+        type: string
+        default: '7'
       generate_attestations:
         description: "Whether to generate build provenance attestations (default: true)"
         required: false

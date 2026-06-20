@@ -11,8 +11,8 @@ on:
       retention_days:
         description: "Artifact retention days"
         required: false
-        type: number
-        default: 7
+        type: string
+        default: '7'
       draft:
         description: "Whether to create a draft release"
         required: false
