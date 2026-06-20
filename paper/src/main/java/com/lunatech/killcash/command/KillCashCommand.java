@@ -1,7 +1,8 @@
 package com.lunatech.killcash.command;
 
 import dev.jorel.commandapi.CommandAPICommand;
-import dev.jorel.commandapi.arguments.OfflinePlayerArgument;
+import dev.jorel.commandapi.arguments.ArgumentSuggestions;
+import dev.jorel.commandapi.arguments.StringArgument;
 import dev.jorel.commandapi.executors.CommandArguments;
 import com.lunatech.killcash.AbstractKillCash;
 import com.lunatech.killcash.KillCash;
@@ -24,8 +25,8 @@ final class KillCashCommand extends Command {
     /**
      * Instantiates the killcash command.
      */
-    KillCashCommand(KillCash plugin) {
-        this.plugin = plugin;
+    KillCashCommand(AbstractKillCash plugin) {
+        this.plugin = (KillCash) plugin;
     }
 
     @Override
@@ -55,16 +56,23 @@ final class KillCashCommand extends Command {
         return new CommandAPICommand("stats")
             .withHelp("View player PvP statistics.", "View player PvP statistics.")
             .withPermission(BASE_PERM + ".stats")
-            .withArguments(new OfflinePlayerArgument("target").setOptional(true))
+            .withArguments(new StringArgument("target")
+                .replaceSuggestions(ArgumentSuggestions.stringCollection(unused ->
+                    plugin.getServer().getOnlinePlayers().stream().map(Player::getName).toList()
+                ))
+                .setOptional(true)
+            )
             .executes((sender, args) -> {
-                OfflinePlayer target = args.getByClassOrDefault("target", OfflinePlayer.class, null);
-                if (target == null) {
+                String targetName = args.getByClassOrDefault("target", String.class, null);
+                if (targetName == null) {
                     if (sender instanceof Player player) {
                         showStats(player, player);
                     } else {
                         sender.sendMessage(Translation.as("commands.killcash.only-players"));
                     }
                 } else {
+                    @SuppressWarnings("deprecation")
+                    OfflinePlayer target = plugin.getServer().getOfflinePlayer(targetName);
                     showStats(sender, target);
                 }
             });
@@ -74,16 +82,23 @@ final class KillCashCommand extends Command {
         return new CommandAPICommand("balance")
             .withHelp("View player economy balance.", "View player economy balance.")
             .withPermission(BASE_PERM + ".balance")
-            .withArguments(new OfflinePlayerArgument("target").setOptional(true))
+            .withArguments(new StringArgument("target")
+                .replaceSuggestions(ArgumentSuggestions.stringCollection(unused ->
+                    plugin.getServer().getOnlinePlayers().stream().map(Player::getName).toList()
+                ))
+                .setOptional(true)
+            )
             .executes((sender, args) -> {
-                OfflinePlayer target = args.getByClassOrDefault("target", OfflinePlayer.class, null);
-                if (target == null) {
+                String targetName = args.getByClassOrDefault("target", String.class, null);
+                if (targetName == null) {
                     if (sender instanceof Player player) {
                         showBalance(player, player);
                     } else {
                         sender.sendMessage(Translation.as("commands.killcash.only-players"));
                     }
                 } else {
+                    @SuppressWarnings("deprecation")
+                    OfflinePlayer target = plugin.getServer().getOfflinePlayer(targetName);
                     showBalance(sender, target);
                 }
             });
@@ -130,7 +145,7 @@ final class KillCashCommand extends Command {
                 .build());
         } else {
             String name = target.getName();
-            if (name == null) {
+            if (name == null || (!target.hasPlayedBefore() && plugin.getServer().getPlayer(name) == null)) {
                 sender.sendMessage(Translation.as("commands.killcash.stats.player-not-found"));
                 return;
             }
@@ -150,7 +165,7 @@ final class KillCashCommand extends Command {
                 .build());
         } else {
             String name = target.getName();
-            if (name == null) {
+            if (name == null || (!target.hasPlayedBefore() && plugin.getServer().getPlayer(name) == null)) {
                 sender.sendMessage(Translation.as("commands.killcash.stats.player-not-found"));
                 return;
             }
