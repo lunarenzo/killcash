@@ -15,6 +15,7 @@ import org.bukkit.entity.Player;
 import java.net.InetSocketAddress;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Supplier;
 
 /**
  * Default implementation of {@link KillRewardService}.
@@ -22,18 +23,18 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 public class DefaultKillRewardService implements KillRewardService {
     private final ConfigHandler configHandler;
-    private final EconomyProvider economyProvider;
+    private final Supplier<EconomyProvider> economyProviderSupplier;
     private final KillCooldownCache cooldownCache;
     private final MessageService messageService;
 
     public DefaultKillRewardService(
             ConfigHandler configHandler,
-            EconomyProvider economyProvider,
+            Supplier<EconomyProvider> economyProviderSupplier,
             KillCooldownCache cooldownCache,
             MessageService messageService
     ) {
         this.configHandler = configHandler;
-        this.economyProvider = economyProvider;
+        this.economyProviderSupplier = economyProviderSupplier;
         this.cooldownCache = cooldownCache;
         this.messageService = messageService;
     }
@@ -119,7 +120,7 @@ public class DefaultKillRewardService implements KillRewardService {
 
         // Perform economy operations asynchronously off-thread to avoid blocking tick speed
         Scheduler.async(() -> {
-            boolean success = economyProvider.deposit(killer, finalReward);
+            boolean success = economyProviderSupplier.get().deposit(killer, finalReward);
             if (success) {
                 // Dispatch message back to player's thread context
                 Scheduler.sync(() -> {
