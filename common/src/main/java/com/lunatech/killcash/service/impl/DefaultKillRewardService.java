@@ -7,7 +7,7 @@ import com.lunatech.killcash.constant.PDCKeys;
 import com.lunatech.killcash.hook.EconomyProvider;
 import com.lunatech.killcash.pdc.PDCUtil;
 import com.lunatech.killcash.service.KillRewardService;
-import io.github.milkdrinkers.colorparser.paper.ColorParser;
+import io.github.milkdrinkers.colorparser.ColorParser;
 import io.github.milkdrinkers.threadutil.Scheduler;
 import io.github.milkdrinkers.wordweaver.Translation;
 import org.bukkit.Statistic;
