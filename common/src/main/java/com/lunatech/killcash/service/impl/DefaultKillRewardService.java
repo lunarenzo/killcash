@@ -7,13 +7,13 @@ import com.lunatech.killcash.constant.PDCKeys;
 import com.lunatech.killcash.hook.EconomyProvider;
 import com.lunatech.killcash.pdc.PDCUtil;
 import com.lunatech.killcash.service.KillRewardService;
-import io.github.milkdrinkers.colorparser.ColorParser;
+import com.lunatech.killcash.service.MessageService;
 import io.github.milkdrinkers.threadutil.Scheduler;
-import io.github.milkdrinkers.wordweaver.Translation;
 import org.bukkit.Statistic;
 import org.bukkit.entity.Player;
 
 import java.net.InetSocketAddress;
+import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -24,15 +24,18 @@ public class DefaultKillRewardService implements KillRewardService {
     private final ConfigHandler configHandler;
     private final EconomyProvider economyProvider;
     private final KillCooldownCache cooldownCache;
+    private final MessageService messageService;
 
     public DefaultKillRewardService(
             ConfigHandler configHandler,
             EconomyProvider economyProvider,
-            KillCooldownCache cooldownCache
+            KillCooldownCache cooldownCache,
+            MessageService messageService
     ) {
         this.configHandler = configHandler;
         this.economyProvider = economyProvider;
         this.cooldownCache = cooldownCache;
+        this.messageService = messageService;
     }
 
     @Override
@@ -50,7 +53,7 @@ public class DefaultKillRewardService implements KillRewardService {
                 String killerIp = killerAddr.getAddress().getHostAddress();
                 String victimIp = victimAddr.getAddress().getHostAddress();
                 if (killerIp.equals(victimIp)) {
-                    killer.sendMessage(ColorParser.of(Translation.of("pvp.anti-abuse-same-ip")).build());
+                    messageService.sendMessage(killer, "pvp.anti-abuse-same-ip");
                     return;
                 }
             }
@@ -61,18 +64,14 @@ public class DefaultKillRewardService implements KillRewardService {
         if (minPlaytimeSec > 0) {
             long victimPlaytimeSec = victim.getStatistic(Statistic.PLAY_ONE_MINUTE) / 20; // 20 ticks = 1 second
             if (victimPlaytimeSec < minPlaytimeSec) {
-                killer.sendMessage(ColorParser.of(Translation.of("pvp.anti-abuse-playtime"))
-                        .with("victim", victim.getName())
-                        .build());
+                messageService.sendMessage(killer, "pvp.anti-abuse-playtime", Map.of("victim", victim.getName()));
                 return;
             }
         }
 
         // 3. Cooldown Check
         if (cooldownCache.isOnCooldown(killer.getUniqueId(), victim.getUniqueId())) {
-            killer.sendMessage(ColorParser.of(Translation.of("pvp.anti-abuse-cooldown"))
-                    .with("victim", victim.getName())
-                    .build());
+            messageService.sendMessage(killer, "pvp.anti-abuse-cooldown", Map.of("victim", victim.getName()));
             return;
         }
 
@@ -125,15 +124,13 @@ public class DefaultKillRewardService implements KillRewardService {
                 // Dispatch message back to player's thread context
                 Scheduler.sync(() -> {
                     if (killer.isOnline()) {
-                        killer.sendMessage(ColorParser.of(Translation.of("pvp.reward-received"))
-                                .with("amount", String.format("%.2f", finalReward))
-                                .with("victim", victim.getName())
-                                .build());
-                        
+                        messageService.sendMessage(killer, "pvp.reward-received", Map.of(
+                                "amount", String.format("%.2f", finalReward),
+                                "victim", victim.getName()
+                        ));
+
                         // Notify killer of their current streak
-                        killer.sendMessage(ColorParser.of(Translation.of("pvp.streak-active"))
-                                .with("streak", String.valueOf(newStreak))
-                                .build());
+                        messageService.sendMessage(killer, "pvp.streak-active", Map.of("streak", String.valueOf(newStreak)));
                     }
                 }).execute();
             }

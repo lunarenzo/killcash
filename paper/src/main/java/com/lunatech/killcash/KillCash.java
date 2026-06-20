@@ -64,7 +64,8 @@ public class KillCash extends AbstractKillCash {
             .build();
         hookManager = new HookManager(this);
         cooldownCache = new com.lunatech.killcash.cache.impl.ConcurrentKillCooldownCache();
-        killRewardService = new com.lunatech.killcash.service.impl.DefaultKillRewardService(configHandler, hookManager.getEconomyProvider(), cooldownCache);
+        var messageService = new com.lunatech.killcash.service.impl.PaperMessageService();
+        killRewardService = new com.lunatech.killcash.service.impl.DefaultKillRewardService(configHandler, hookManager.getEconomyProvider(), cooldownCache, messageService);
         commandHandler = new CommandHandler(this);
         listenerHandler = new ListenerHandler(this);
         updateHandler = new UpdateHandler(this);
