@@ -22,5 +22,12 @@
       "failure": "<red>Failed to upload dump: <error>",
       "dumping": "<green>Gathering dump information and uploading to mclo.gs..."
     }
+  },
+  "pvp": {
+    "reward-received": "<green>You earned <gold>$<amount></gold> for killing <white><victim></white>!",
+    "anti-abuse-cooldown": "<red>You killed <white><victim></white> too recently. No reward issued.",
+    "anti-abuse-same-ip": "<red>You cannot earn rewards for killing players on the same network.",
+    "anti-abuse-playtime": "<red>Victim <white><victim></white> does not have enough playtime. No reward issued.",
+    "streak-active": "<green>You are currently on a <gold><streak></gold> killstreak!"
   }
 }
