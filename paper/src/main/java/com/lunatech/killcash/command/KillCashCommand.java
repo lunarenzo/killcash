@@ -38,8 +38,7 @@ final class KillCashCommand extends Command {
                 commandStats(),
                 commandBalance(),
                 commandReload(),
-                commandHelp(),
-                new DumpCommand().command()
+                commandHelp()
             )
             .executes(this::executorKillCash);
     }

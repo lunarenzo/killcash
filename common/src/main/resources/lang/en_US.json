@@ -7,7 +7,7 @@
   },
   "commands": {
     "killcash": {
-      "help": "\n<green>--- KillCash Help ---</green>\n<gold>/killcash stats [player]</gold> - <gray>View player statistics</gray>\n<gold>/killcash balance [player]</gold> - <gray>View player economy balance</gray>\n<gold>/killcash reload</gold> - <gray>Reload configuration and translations</gray>\n<gold>/killcash dump</gold> - <gray>Generate plugin debug log</gray>\n",
+      "help": "\n<green>--- KillCash Help ---</green>\n<gold>/killcash stats [player]</gold> - <gray>View player statistics</gray>\n<gold>/killcash balance [player]</gold> - <gray>View player economy balance</gray>\n<gold>/killcash reload</gold> - <gray>Reload configuration and translations</gray>\n",
       "only-players": "<red>This command can only be executed by players.</red>",
       "stats": {
         "self": "\n<green>--- Your PvP Statistics ---</green>\n<gray>Balance:</gray> <gold>$<balance></gold>\n<gray>Kills:</gray> <white><kills></white>\n<gray>Deaths:</gray> <white><deaths></white>\n<gray>Killstreak:</gray> <white><streak></white>\n",
@@ -22,22 +22,6 @@
       "reload": {
         "success": "<green>Successfully reloaded KillCash configuration and translations!</green>"
       }
-    },
-    "translation": {
-      "help": "\n<white>Translations subcommands:\n  <dark_gray>• <white>reload: <gray><i>Reloads the translation files.\n  <dark_gray>• <white>test <node>: <gray><i>Test a translation.\n",
-      "reloaded": "<green>Successfully reloaded translations!",
-      "test": {
-        "not-string": "<red>Translation node must be a string!",
-        "not-empty": "<red>Translation node \"<u><node></u>\" cannot be empty!",
-        "illegal": "<red>Translation node \"<u><node></u>\" cannot begin or end with a period!",
-        "not-found": "<red>Translation entry for node \"<u><node></u>\" doesn't exist!",
-        "not-empty2": "<red>Translation entry for node \"<u><node></u>\" is empty!"
-      }
-    },
-    "dump": {
-      "success": "<green>Successfully uploaded dump to <hover:show_text:'Click to open link'><click:open_url:'<link>'><u><link></u></click></hover>.",
-      "failure": "<red>Failed to upload dump: <error>",
-      "dumping": "<green>Gathering dump information and uploading to mclo.gs..."
     }
   },
   "pvp": {
