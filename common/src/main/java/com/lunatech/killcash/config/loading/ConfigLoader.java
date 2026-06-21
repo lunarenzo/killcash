@@ -290,6 +290,7 @@ public class ConfigLoader {
                 logger.warn("Could not instantiate {} to apply migrations, skipping", configClass.getSimpleName());
         }
 
+        final CommentedConfigurationNode originalNode = node.copy();
         T config = node.get(configClass);
         if (config == null)
             throw new ConfigurateException("Deserialization returned null for " + configClass.getSimpleName());
@@ -299,7 +300,7 @@ public class ConfigLoader {
         final CommentedConfigurationNode newRoot = CommentedConfigurationNode.root(loader.defaultOptions());
         newRoot.set(config);
 
-        if (originallyEmpty || currentVersion != newVersion) {
+        if (originallyEmpty || currentVersion != newVersion || !originalNode.equals(node)) {
             loader.save(newRoot);
         }
 
@@ -335,7 +336,7 @@ public class ConfigLoader {
             .nodeStyle(nodeStyle)
             .defaultOptions(options -> InterfaceDefaultOptions.addTo(options, builder -> {
                     })
-                    .shouldCopyDefaults(false)
+                    .shouldCopyDefaults(true)
                     .header(header)
                     .serializers(builder -> builder.registerAll(serializerBuilder.build()))
             )
