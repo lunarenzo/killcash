@@ -205,6 +205,7 @@ public final class DatabaseHandler extends AbstractService implements Reloadable
         jooqContext = null;
         connectionPool.close();
         connectionPool = null;
+        config = null;
 
         logger.info(LOG_PREFIX + "Shutdown completed.");
     }

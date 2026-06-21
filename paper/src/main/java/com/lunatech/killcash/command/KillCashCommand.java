@@ -38,6 +38,9 @@ final class KillCashCommand extends Command {
                 commandStats(),
                 commandBalance(),
                 commandReload(),
+                commandReloadConfig(),
+                commandReloadLang(),
+                commandReloadAll(),
                 commandHelp()
             )
             .executes(this::executorKillCash);
@@ -105,7 +108,57 @@ final class KillCashCommand extends Command {
 
     private CommandAPICommand commandReload() {
         return new CommandAPICommand("reload")
-            .withHelp("Reload config and translations.", "Reload config and translations.")
+            .withHelp("Reload plugin configuration, translations, or everything.", "Reload plugin configuration, translations, or everything.")
+            .withPermission(BASE_PERM + ".reload")
+            .withSubcommands(
+                new CommandAPICommand("config")
+                    .withHelp("Reload config and database configurations only.", "Reload config and database configurations only.")
+                    .executes((sender, args) -> {
+                        plugin.reloadConfigOnly();
+                        sender.sendMessage(Translation.as("commands.killcash.reload.config.success"));
+                    }),
+                new CommandAPICommand("lang")
+                    .withHelp("Reload translation files only.", "Reload translation files only.")
+                    .executes((sender, args) -> {
+                        plugin.reloadLangOnly();
+                        sender.sendMessage(Translation.as("commands.killcash.reload.lang.success"));
+                    }),
+                new CommandAPICommand("all")
+                    .withHelp("Reload the entirety of the plugin.", "Reload the entirety of the plugin.")
+                    .executes((sender, args) -> {
+                        plugin.onReload();
+                        sender.sendMessage(Translation.as("commands.killcash.reload.success"));
+                    })
+            )
+            .executes((sender, args) -> {
+                plugin.onReload();
+                sender.sendMessage(Translation.as("commands.killcash.reload.success"));
+            });
+    }
+
+    private CommandAPICommand commandReloadConfig() {
+        return new CommandAPICommand("reloadconfig")
+            .withHelp("Reload config and database configurations only.", "Reload config and database configurations only.")
+            .withPermission(BASE_PERM + ".reload")
+            .executes((sender, args) -> {
+                plugin.reloadConfigOnly();
+                sender.sendMessage(Translation.as("commands.killcash.reload.config.success"));
+            });
+    }
+
+    private CommandAPICommand commandReloadLang() {
+        return new CommandAPICommand("reloadlang")
+            .withHelp("Reload translation files only.", "Reload translation files only.")
+            .withPermission(BASE_PERM + ".reload")
+            .executes((sender, args) -> {
+                plugin.reloadLangOnly();
+                sender.sendMessage(Translation.as("commands.killcash.reload.lang.success"));
+            });
+    }
+
+    private CommandAPICommand commandReloadAll() {
+        return new CommandAPICommand("reloadall")
+            .withHelp("Reload the entirety of the plugin.", "Reload the entirety of the plugin.")
             .withPermission(BASE_PERM + ".reload")
             .executes((sender, args) -> {
                 plugin.onReload();

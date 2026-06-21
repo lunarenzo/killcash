@@ -7,7 +7,7 @@
   },
   "commands": {
     "killcash": {
-      "help": "\n<green>--- KillCash Help ---</green>\n<gold>/killcash stats [player]</gold> - <gray>View player statistics</gray>\n<gold>/killcash balance [player]</gold> - <gray>View player economy balance</gray>\n<gold>/killcash reload</gold> - <gray>Reload configuration and translations</gray>\n",
+      "help": "\n<green>--- KillCash Help ---</green>\n<gold>/killcash stats [player]</gold> - <gray>View player statistics</gray>\n<gold>/killcash balance [player]</gold> - <gray>View player economy balance</gray>\n<gold>/killcash reload [config|lang|all]</gold> - <gray>Reload plugin</gray>\n",
       "only-players": "<red>This command can only be executed by players.</red>",
       "stats": {
         "self": "\n<green>--- Your PvP Statistics ---</green>\n<gray>Balance:</gray> <gold>$<balance></gold>\n<gray>Kills:</gray> <white><kills></white>\n<gray>Deaths:</gray> <white><deaths></white>\n<gray>Killstreak:</gray> <white><streak></white>\n",
@@ -20,7 +20,13 @@
         "other": "<green><player>'s current balance is <gold>$<balance></gold>.</green>"
       },
       "reload": {
-        "success": "<green>Successfully reloaded KillCash configuration and translations!</green>"
+        "success": "<green>Successfully reloaded KillCash configuration and translations!</green>",
+        "config": {
+          "success": "<green>Successfully reloaded KillCash configuration files!</green>"
+        },
+        "lang": {
+          "success": "<green>Successfully reloaded KillCash translation files!</green>"
+        }
       }
     }
   },

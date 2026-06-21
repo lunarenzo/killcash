@@ -117,12 +117,46 @@ public class KillCash extends AbstractKillCash {
     }
 
     /**
-     * Use to reload the entire plugin.
+     * Reload only the plugin configuration files.
+     */
+    public void reloadConfigOnly() {
+        if (configHandler != null) {
+            configHandler.onLoad(this);
+        }
+    }
+
+    /**
+     * Reload only the translation language files.
+     */
+    public void reloadLangOnly() {
+        if (configHandler != null && configHandler.getConfig() != null) {
+            io.github.milkdrinkers.wordweaver.Translation.setLanguage(configHandler.getConfig().language);
+        }
+        io.github.milkdrinkers.wordweaver.Translation.reload();
+    }
+
+    /**
+     * Reload database connections and messaging setup.
+     */
+    public void reloadDatabaseOnly() {
+        if (databaseHandler != null) {
+            databaseHandler.onDisable(this);
+            databaseHandler.onLoad(this);
+        }
+        if (messagingHandler != null) {
+            messagingHandler.onDisable(this);
+            messagingHandler.onLoad(this);
+            messagingHandler.onEnable(this);
+        }
+    }
+
+    /**
+     * Use to reload the entire plugin (excluding Brigadier command registrations).
      */
     public void onReload() {
-        onDisable();
-        onLoad();
-        onEnable();
+        reloadConfigOnly();
+        reloadLangOnly();
+        reloadDatabaseOnly();
     }
 
     @Override
