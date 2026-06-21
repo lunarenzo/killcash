@@ -322,6 +322,13 @@ final class KillCashCommand extends Command {
                 }
 
                 OfflinePlayer target = resolvePlayer(targetName);
+                if (!target.isOnline() || target.getPlayer() == null) {
+                    player.sendMessage(ColorParser.of(Translation.of("commands.killcash.pay.player-offline"))
+                        .with("player", target.getName() != null ? target.getName() : targetName)
+                        .build());
+                    return;
+                }
+
                 if (target.getUniqueId().equals(player.getUniqueId())) {
                     player.sendMessage(ColorParser.of(Translation.of("commands.killcash.pay.self-payment")).build());
                     return;

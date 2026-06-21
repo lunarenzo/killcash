@@ -24,7 +24,8 @@
         "success-receiver": "<green>You received <gold>$<amount></gold> from <white><sender></white>.</green>",
         "insufficient-funds": "<red>You do not have enough money to pay <gold>$<amount></gold> (Current balance: <gold>$<balance></gold>).</red>",
         "invalid-amount": "<red>The amount must be a positive number.</red>",
-        "self-payment": "<red>You cannot pay yourself.</red>"
+        "self-payment": "<red>You cannot pay yourself.</red>",
+        "player-offline": "<red>Player <white><player></white> is currently offline.</red>"
       },
       "baltop": {
         "header": "\n<green>--- KillCash Leaderboard (Top 10) ---</green>\n",
