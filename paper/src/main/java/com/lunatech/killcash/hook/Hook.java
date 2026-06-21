@@ -4,6 +4,7 @@ import com.lunatech.killcash.hook.bstats.BStatsHook;
 import com.lunatech.killcash.hook.packetevents.PacketEventsHook;
 import com.lunatech.killcash.hook.placeholderapi.PAPIHook;
 import com.lunatech.killcash.hook.vault.VaultHook;
+import com.lunatech.killcash.hook.floodgate.FloodgateHook;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -15,7 +16,8 @@ public enum Hook {
     BStats(BStatsHook.class, null, false),
     PAPI(PAPIHook.class, "PlaceholderAPI", true),
     PacketEvents(PacketEventsHook.class, "PacketEvents", true),
-    Vault(VaultHook.class, "Vault", true);
+    Vault(VaultHook.class, "Vault", true),
+    Floodgate(FloodgateHook.class, "Floodgate", true);
 
     private final @NotNull Class<? extends AbstractHook> hookClass; // The hook class used by this hook
     private final @Nullable String pluginName; // The plugin name used by this hook or null if not applicable
@@ -148,5 +150,15 @@ public enum Hook {
     @NotNull
     public static PacketEventsHook getPacketEventsHook() {
         return (PacketEventsHook) Hook.PacketEvents.get();
+    }
+
+    /**
+     * Gets Floodgate hook.
+     *
+     * @return the Floodgate hook
+     */
+    @NotNull
+    public static FloodgateHook getFloodgateHook() {
+        return (FloodgateHook) Hook.Floodgate.get();
     }
 }

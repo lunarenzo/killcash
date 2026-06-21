@@ -130,7 +130,7 @@ bukkit { // Options: https://docs.eldoria.de/pluginyml/bukkit/
     // Misc properties
     load = net.minecrell.pluginyml.bukkit.BukkitPluginDescription.PluginLoadOrder.POSTWORLD // STARTUP or POSTWORLD
     depend = listOf()
-    softDepend = listOf("Vault", "PlaceholderAPI")
+    softDepend = listOf("Vault", "PlaceholderAPI", "Floodgate")
     loadBefore = listOf()
     provides = listOf()
 }
@@ -160,6 +160,10 @@ paper { // Options: https://docs.eldoria.de/pluginyml/paper/
             required = false
         }
         register("PlaceholderAPI") {
+            load = PaperPluginDescription.RelativeLoadOrder.BEFORE
+            required = false
+        }
+        register("Floodgate") {
             load = PaperPluginDescription.RelativeLoadOrder.BEFORE
             required = false
         }

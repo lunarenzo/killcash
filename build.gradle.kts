@@ -59,6 +59,7 @@ subprojects {
 
         compileOnly(rootProject.libs.paper.api)
         compileOnly(rootProject.libs.vault)
+        compileOnly(rootProject.libs.floodgate.api)
     }
 
     tasks {

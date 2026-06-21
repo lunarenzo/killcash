@@ -13,6 +13,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.Map;
+import java.util.UUID;
 
 import static com.lunatech.killcash.command.CommandHandler.BASE_PERM;
 
@@ -73,8 +74,7 @@ final class KillCashCommand extends Command {
                         sender.sendMessage(Translation.as("commands.killcash.only-players"));
                     }
                 } else {
-                    @SuppressWarnings("deprecation")
-                    OfflinePlayer target = plugin.getServer().getOfflinePlayer(targetName);
+                    OfflinePlayer target = resolvePlayer(targetName);
                     showStats(sender, target);
                 }
             });
@@ -99,8 +99,7 @@ final class KillCashCommand extends Command {
                         sender.sendMessage(Translation.as("commands.killcash.only-players"));
                     }
                 } else {
-                    @SuppressWarnings("deprecation")
-                    OfflinePlayer target = plugin.getServer().getOfflinePlayer(targetName);
+                    OfflinePlayer target = resolvePlayer(targetName);
                     showBalance(sender, target);
                 }
             });
@@ -226,5 +225,25 @@ final class KillCashCommand extends Command {
                 .with("balance", String.format("%.2f", balance))
                 .build());
         }
+    }
+
+    private OfflinePlayer resolvePlayer(String targetName) {
+        Player onlinePlayer = plugin.getServer().getPlayer(targetName);
+        if (onlinePlayer != null) {
+            return onlinePlayer;
+        }
+        if (com.lunatech.killcash.hook.Hook.Floodgate.isLoaded()) {
+            com.lunatech.killcash.hook.floodgate.FloodgateHook floodgate = com.lunatech.killcash.hook.Hook.getFloodgateHook();
+            String prefix = floodgate.getPlayerPrefix();
+            if (targetName.startsWith(prefix)) {
+                UUID bedrockUuid = floodgate.resolveBedrockUuid(targetName);
+                if (bedrockUuid != null) {
+                    return plugin.getServer().getOfflinePlayer(bedrockUuid);
+                }
+            }
+        }
+        @SuppressWarnings("deprecation")
+        OfflinePlayer target = plugin.getServer().getOfflinePlayer(targetName);
+        return target;
     }
 }
