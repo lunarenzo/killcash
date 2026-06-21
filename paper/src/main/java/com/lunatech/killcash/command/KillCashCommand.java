@@ -14,6 +14,9 @@ import org.bukkit.entity.Player;
 
 import java.util.Map;
 import java.util.UUID;
+import java.util.ArrayList;
+import java.util.List;
+import dev.jorel.commandapi.arguments.DoubleArgument;
 
 import static com.lunatech.killcash.command.CommandHandler.BASE_PERM;
 
@@ -38,6 +41,8 @@ final class KillCashCommand extends Command {
             .withSubcommands(
                 commandStats(),
                 commandBalance(),
+                commandPay(),
+                commandBaltop(),
                 commandReload(),
                 commandReloadConfig(),
                 commandReloadLang(),
@@ -245,5 +250,139 @@ final class KillCashCommand extends Command {
         @SuppressWarnings("deprecation")
         OfflinePlayer target = plugin.getServer().getOfflinePlayer(targetName);
         return target;
+    }
+
+    private static final long LEADERBOARD_CACHE_DURATION_MS = 5 * 60 * 1000;
+    private long lastLeaderboardUpdate = 0;
+    private List<LeaderboardEntry> cachedLeaderboard = new ArrayList<>();
+    private boolean isUpdatingLeaderboard = false;
+
+    private record LeaderboardEntry(String name, double balance) {}
+
+    private void updateLeaderboardAsync() {
+        if (isUpdatingLeaderboard) {
+            return;
+        }
+        isUpdatingLeaderboard = true;
+
+        io.github.milkdrinkers.threadutil.Scheduler.async(() -> {
+            try {
+                OfflinePlayer[] offlinePlayers = plugin.getServer().getOfflinePlayers();
+                List<LeaderboardEntry> entries = new ArrayList<>();
+                var economy = plugin.getHookManager().getEconomyProvider();
+
+                for (OfflinePlayer player : offlinePlayers) {
+                    if (player.getName() == null) continue;
+                    double balance = economy.getBalance(player);
+                    entries.add(new LeaderboardEntry(player.getName(), balance));
+                }
+
+                entries.sort((a, b) -> Double.compare(b.balance(), a.balance()));
+
+                List<LeaderboardEntry> top10 = entries.stream().limit(10).toList();
+
+                io.github.milkdrinkers.threadutil.Scheduler.sync(() -> {
+                    cachedLeaderboard = top10;
+                    lastLeaderboardUpdate = System.currentTimeMillis();
+                    isUpdatingLeaderboard = false;
+                }).execute();
+            } catch (Throwable t) {
+                isUpdatingLeaderboard = false;
+            }
+        }).execute();
+    }
+
+    private CommandAPICommand commandPay() {
+        return new CommandAPICommand("pay")
+            .withHelp("Pay another player with your killcash balance.", "Pay another player with your killcash balance.")
+            .withPermission(BASE_PERM + ".pay")
+            .withArguments(
+                new StringArgument("target")
+                    .replaceSuggestions(ArgumentSuggestions.stringCollection(unused ->
+                        plugin.getServer().getOnlinePlayers().stream().map(Player::getName).toList()
+                    )),
+                new DoubleArgument("amount", 0.01)
+            )
+            .executes((sender, args) -> {
+                if (!(sender instanceof Player player)) {
+                    sender.sendMessage(Translation.as("commands.killcash.only-players"));
+                    return;
+                }
+
+                String targetName = args.getByClassOrDefault("target", String.class, null);
+                Double amount = args.getByClassOrDefault("amount", Double.class, null);
+
+                if (targetName == null || amount == null) {
+                    return;
+                }
+
+                if (amount <= 0) {
+                    player.sendMessage(ColorParser.of(Translation.of("commands.killcash.pay.invalid-amount")).build());
+                    return;
+                }
+
+                OfflinePlayer target = resolvePlayer(targetName);
+                if (target.getUniqueId().equals(player.getUniqueId())) {
+                    player.sendMessage(ColorParser.of(Translation.of("commands.killcash.pay.self-payment")).build());
+                    return;
+                }
+
+                double senderBalance = plugin.getHookManager().getEconomyProvider().getBalance(player);
+                if (senderBalance < amount) {
+                    player.sendMessage(ColorParser.of(Translation.of("commands.killcash.pay.insufficient-funds"))
+                        .with("amount", String.format("%.2f", amount))
+                        .with("balance", String.format("%.2f", senderBalance))
+                        .build());
+                    return;
+                }
+
+                boolean withdrawSuccess = plugin.getHookManager().getEconomyProvider().withdraw(player, amount);
+                if (withdrawSuccess) {
+                    boolean depositSuccess = plugin.getHookManager().getEconomyProvider().deposit(target, amount);
+                    if (depositSuccess) {
+                        player.sendMessage(ColorParser.of(Translation.of("commands.killcash.pay.success-sender"))
+                            .with("amount", String.format("%.2f", amount))
+                            .with("receiver", target.getName() != null ? target.getName() : targetName)
+                            .build());
+
+                        if (target.isOnline() && target.getPlayer() != null) {
+                            target.getPlayer().sendMessage(ColorParser.of(Translation.of("commands.killcash.pay.success-receiver"))
+                                .with("amount", String.format("%.2f", amount))
+                                .with("sender", player.getName())
+                                .build());
+                        }
+                    } else {
+                        plugin.getHookManager().getEconomyProvider().deposit(player, amount);
+                    }
+                }
+            });
+    }
+
+    private CommandAPICommand commandBaltop() {
+        return new CommandAPICommand("baltop")
+            .withAliases("balancetop")
+            .withHelp("View top 10 players with the highest balance.", "View top 10 players with the highest balance.")
+            .withPermission(BASE_PERM + ".baltop")
+            .executes((sender, args) -> {
+                long now = System.currentTimeMillis();
+                if (cachedLeaderboard.isEmpty() || (now - lastLeaderboardUpdate > LEADERBOARD_CACHE_DURATION_MS)) {
+                    updateLeaderboardAsync();
+                }
+
+                if (cachedLeaderboard.isEmpty()) {
+                    sender.sendMessage(ColorParser.of("<gray>Leaderboard is currently generating, please wait...</gray>").build());
+                    return;
+                }
+
+                sender.sendMessage(ColorParser.of(Translation.of("commands.killcash.baltop.header")).build());
+                for (int i = 0; i < cachedLeaderboard.size(); i++) {
+                    LeaderboardEntry entry = cachedLeaderboard.get(i);
+                    sender.sendMessage(ColorParser.of(Translation.of("commands.killcash.baltop.entry"))
+                        .with("pos", String.valueOf(i + 1))
+                        .with("player", entry.name())
+                        .with("balance", String.format("%.2f", entry.balance()))
+                        .build());
+                }
+            });
     }
 }

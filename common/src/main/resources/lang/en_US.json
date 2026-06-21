@@ -7,7 +7,7 @@
   },
   "commands": {
     "killcash": {
-      "help": "\n<green>--- KillCash Help ---</green>\n<gold>/killcash stats [player]</gold> - <gray>View player statistics</gray>\n<gold>/killcash balance [player]</gold> - <gray>View player economy balance</gray>\n<gold>/killcash reload [config|lang|all]</gold> - <gray>Reload plugin</gray>\n",
+      "help": "\n<green>--- KillCash Help ---</green>\n<gold>/killcash stats [player]</gold> - <gray>View player statistics</gray>\n<gold>/killcash balance [player]</gold> - <gray>View player economy balance</gray>\n<gold>/killcash pay <player> <amount></gold> - <gray>Pay another player</gray>\n<gold>/killcash baltop</gold> - <gray>View top 10 player balances</gray>\n<gold>/killcash reload [config|lang|all]</gold> - <gray>Reload plugin</gray>\n",
       "only-players": "<red>This command can only be executed by players.</red>",
       "stats": {
         "self": "\n<green>--- Your PvP Statistics ---</green>\n<gray>Balance:</gray> <gold>$<balance></gold>\n<gray>Kills:</gray> <white><kills></white>\n<gray>Deaths:</gray> <white><deaths></white>\n<gray>Killstreak:</gray> <white><streak></white>\n",
@@ -18,6 +18,17 @@
       "balance": {
         "self": "<green>Your current balance is <gold>$<balance></gold>.</green>",
         "other": "<green><player>'s current balance is <gold>$<balance></gold>.</green>"
+      },
+      "pay": {
+        "success-sender": "<green>You paid <gold>$<amount></gold> to <white><receiver></white>.</green>",
+        "success-receiver": "<green>You received <gold>$<amount></gold> from <white><sender></white>.</green>",
+        "insufficient-funds": "<red>You do not have enough money to pay <gold>$<amount></gold> (Current balance: <gold>$<balance></gold>).</red>",
+        "invalid-amount": "<red>The amount must be a positive number.</red>",
+        "self-payment": "<red>You cannot pay yourself.</red>"
+      },
+      "baltop": {
+        "header": "\n<green>--- KillCash Leaderboard (Top 10) ---</green>\n",
+        "entry": "<gray><pos>.</gray> <white><player></white> - <gold>$<balance></gold>"
       },
       "reload": {
         "success": "<green>Successfully reloaded KillCash configuration and translations!</green>",
