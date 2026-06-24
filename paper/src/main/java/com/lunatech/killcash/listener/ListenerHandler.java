@@ -28,6 +28,8 @@ public class ListenerHandler implements Reloadable {
     public void onEnable(AbstractKillCash plugin) {
         listeners.clear(); // Clear the list to avoid duplicate listeners when reloading the plugin
         listeners.add(new com.lunatech.killcash.listener.player.PlayerDeathListener(this.plugin.getKillRewardService()));
+        listeners.add(new com.lunatech.killcash.listener.player.PlayerJoinListener(this.plugin.getKillRewardService()));
+        listeners.add(new com.lunatech.killcash.listener.player.PlayerQuitListener(this.plugin.getKillRewardService()));
 
         // Register listeners here
         for (Listener listener : listeners) {

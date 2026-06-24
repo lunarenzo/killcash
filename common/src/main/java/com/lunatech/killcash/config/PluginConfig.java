@@ -76,6 +76,27 @@ public class PluginConfig implements VersionedConfig {
             "10", 1.5
         );
 
+        @Comment("Killstreak settings")
+        public KillstreakSettings killstreakSettings = new KillstreakSettings();
+
+        @ConfigSerializable
+        public static class KillstreakSettings {
+            @Comment("If true, streaks apply to the next bracket up (e.g., streak of 4 gets 3's multiplier)")
+            public boolean useRangeSystem = true;
+
+            @Comment("Time in seconds before a streak starts resetting due to inactivity")
+            public long decayTime = 60;
+
+            @Comment("Cash rewarded per streak level to the person who ends the streak")
+            public double shutdownBonusPerKill = 25.0;
+        }
+
+        @Comment("Server-wide announcements for major killstreak milestones.")
+        public Map<String, String> streakAnnouncements = Map.of(
+            "5", "<red><bold>[KILLSTREAK]</bold></red> <yellow><player> is on a <gold>5 Kill Streak</gold>!</yellow>",
+            "10", "<dark_red><bold>[RAMPAGE]</bold></dark_red> <yellow><player> is unstoppable with a <red>10 Kill Streak</red>!</yellow>"
+        );
+
         @Comment("Anti-Abuse Settings")
         public AntiAbuse antiAbuse = new AntiAbuse();
 

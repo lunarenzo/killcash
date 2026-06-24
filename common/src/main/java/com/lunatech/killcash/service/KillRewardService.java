@@ -13,4 +13,18 @@ public interface KillRewardService {
      * @param victim the player who was killed
      */
     void processKill(Player killer, Player victim);
+
+    /**
+     * Handles player joining the server, potentially restoring their killstreak.
+     *
+     * @param player the player who joined
+     */
+    void handleJoin(Player player);
+
+    /**
+     * Handles player quitting the server, tracking logout time for killstreak expiration.
+     *
+     * @param player the player who quit
+     */
+    void handleQuit(Player player);
 }

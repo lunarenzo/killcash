@@ -85,6 +85,7 @@ public class KillCash extends AbstractKillCash {
             schedulerHandler,
             cooldownHandler,
             cooldownHandler,
+            (com.lunatech.killcash.Reloadable) killRewardService,
             apiHandler
         );
 

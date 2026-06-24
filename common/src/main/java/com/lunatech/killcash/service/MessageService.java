@@ -24,4 +24,40 @@ public interface MessageService {
      * @param placeholders mapping of placeholder keys to replacement values
      */
     void sendMessage(Player player, String translationKey, Map<String, String> placeholders);
+
+    /**
+     * Sends an action bar message to the player with placeholders replaced.
+     *
+     * @param player the recipient player
+     * @param translationKey the key for the translation template
+     * @param placeholders mapping of placeholder keys to replacement values
+     */
+    void sendActionBar(Player player, String translationKey, Map<String, String> placeholders);
+
+    /**
+     * Broadcasts a translation message to the server with placeholders replaced.
+     *
+     * @param translationKey the key for the translation template
+     * @param placeholders mapping of placeholder keys to replacement values
+     */
+    void broadcast(String translationKey, Map<String, String> placeholders);
+
+    /**
+     * Plays a sound for a player.
+     *
+     * @param player the player
+     * @param sound the sound to play
+     * @param volume the volume of the sound
+     * @param pitch the pitch of the sound
+     */
+    void playSound(Player player, org.bukkit.Sound sound, float volume, float pitch);
+
+    /**
+     * Plays a sound for all online players.
+     *
+     * @param sound the sound to play
+     * @param volume the volume of the sound
+     * @param pitch the pitch of the sound
+     */
+    void broadcastSound(org.bukkit.Sound sound, float volume, float pitch);
 }

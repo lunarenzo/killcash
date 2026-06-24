@@ -59,6 +59,8 @@
     "anti-abuse-cooldown": "<red>You killed <white><victim></white> too recently. No reward issued.",
     "anti-abuse-same-ip": "<red>You cannot earn rewards for killing players on the same network.",
     "anti-abuse-playtime": "<red>Victim <white><victim></white> does not have enough playtime. No reward issued.",
-    "streak-active": "<green>You are currently on a <gold><streak></gold> killstreak!"
+    "streak-active": "<green>You are currently on a <gold><streak></gold> killstreak!",
+    "shutdown": "<red><bold>SHUTDOWN!</bold></red> <yellow>You ended <gold><victim>'s</gold> <white><streak>-kill</white> streak and earned a <green>+$<bonus></green> Bonus!</yellow>",
+    "action-bar": "<gold>Active Streak: <yellow><streak></yellow> <dark_gray>(<green><multiplier>x Cash</green>)</dark_gray></gold>"
   }
 }
