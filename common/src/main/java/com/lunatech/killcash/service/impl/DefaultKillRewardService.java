@@ -257,10 +257,12 @@ public class DefaultKillRewardService implements KillRewardService, Reloadable {
         // Visual & Audio feedback
         if (killstreakEnabled) {
             double finalStreakMultiplier = streakMultiplier;
-            messageService.sendActionBar(killer, "pvp.action-bar", Map.of(
-                "streak", String.valueOf(newStreak),
-                "multiplier", String.format("%.2f", finalStreakMultiplier)
-            ));
+            if (settings.killstreakSettings.showActionBar) {
+                messageService.sendActionBar(killer, "pvp.action-bar", Map.of(
+                    "streak", String.valueOf(newStreak),
+                    "multiplier", String.format("%.2f", finalStreakMultiplier)
+                ));
+            }
             messageService.playSound(killer, org.bukkit.Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 1.0f);
 
             // Server-wide Announcement Milestones
@@ -302,7 +304,9 @@ public class DefaultKillRewardService implements KillRewardService, Reloadable {
                             messageService.sendMessage(killer, "pvp.streak-active", Map.of("streak", String.valueOf(finalNewStreak)));
 
                             if (finalShutdownBonus > 0) {
-                                messageService.sendMessage(killer, "pvp.shutdown", Map.of(
+                                messageService.broadcast("pvp.shutdown", Map.of(
+                                    "killer", killer.getName(),
+                                    "player", killer.getName(),
                                     "victim", victim.getName(),
                                     "streak", String.valueOf(finalVictimStreak),
                                     "bonus", String.format("%.2f", finalShutdownBonus)

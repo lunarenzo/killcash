@@ -92,6 +92,9 @@ public class PluginConfig implements VersionedConfig {
 
             @Comment("Cash rewarded per streak level to the person who ends the streak")
             public double shutdownBonusPerKill = 25.0;
+
+            @Comment("Whether to send action bar messages showing active streak and multiplier")
+            public boolean showActionBar = true;
         }
 
         @Comment("Server-wide announcements for major killstreak milestones.")
