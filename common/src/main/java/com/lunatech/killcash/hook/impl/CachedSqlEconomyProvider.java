@@ -45,7 +45,7 @@ public class CachedSqlEconomyProvider implements EconomyProvider, Listener {
 
         // Pre-load online players if plugin is reloaded
         for (Player player : plugin.getServer().getOnlinePlayers()) {
-            loadPlayerBalanceAsync(player.getUniqueId());
+            loadPlayerBalanceAsync(player.getUniqueId(), player);
         }
     }
 
@@ -71,9 +71,26 @@ public class CachedSqlEconomyProvider implements EconomyProvider, Listener {
         );
     }
 
-    private void loadPlayerBalanceAsync(UUID uuid) {
+    private void loadPlayerBalanceAsync(UUID uuid, Player player) {
         plugin.getServer().getAsyncScheduler().runNow(plugin, task -> {
             double balance = loadPlayerBalanceSync(uuid);
+            
+            // If database has no record, check if we can migrate from PDC
+            if (balance == 0.0 && player != null && player.getPersistentDataContainer().has(com.lunatech.killcash.constant.PDCKeys.BALANCE, org.bukkit.persistence.PersistentDataType.DOUBLE)) {
+                double pdcBalance = com.lunatech.killcash.pdc.PDCUtil.getDouble(player, com.lunatech.killcash.constant.PDCKeys.BALANCE, 0.0);
+                if (pdcBalance > 0.0) {
+                    balance = pdcBalance;
+                    savePlayerBalanceSync(uuid, balance);
+                    
+                    plugin.getServer().getGlobalRegionScheduler().execute(plugin, () -> {
+                        if (player.isOnline()) {
+                            player.getPersistentDataContainer().remove(com.lunatech.killcash.constant.PDCKeys.BALANCE);
+                            plugin.getSLF4JLogger().info("[KillCash] Migrated " + player.getName() + "'s balance of " + pdcBalance + " from PDC to DATABASE.");
+                        }
+                    });
+                }
+            }
+            
             tokenCache.put(uuid, balance);
         });
     }
@@ -163,7 +180,7 @@ public class CachedSqlEconomyProvider implements EconomyProvider, Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerJoin(PlayerJoinEvent event) {
-        loadPlayerBalanceAsync(event.getPlayer().getUniqueId());
+        loadPlayerBalanceAsync(event.getPlayer().getUniqueId(), event.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
