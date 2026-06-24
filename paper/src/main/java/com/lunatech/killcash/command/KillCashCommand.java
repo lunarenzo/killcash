@@ -45,6 +45,7 @@ final class KillCashCommand extends Command {
                 commandBaltop(),
                 commandGive(),
                 commandTake(),
+                commandConvert(),
                 commandReload(),
                 commandReloadConfig(),
                 commandReloadLang(),
@@ -577,6 +578,84 @@ final class KillCashCommand extends Command {
                         .with("amount", String.format("%.2f", amount))
                         .with("target", resolvedName)
                         .build());
+                }
+            });
+    }
+
+    private CommandAPICommand commandConvert() {
+        return new CommandAPICommand("convert")
+            .withAliases("exchange")
+            .withHelp("Convert KillCash tokens to main server economy currency.", "Convert KillCash tokens to main server economy currency.")
+            .withPermission(BASE_PERM + ".convert")
+            .withArguments(new DoubleArgument("amount", 0.01))
+            .executes((sender, args) -> {
+                if (!(sender instanceof Player player)) {
+                    sender.sendMessage(Translation.as("commands.killcash.only-players"));
+                    return;
+                }
+
+                var config = plugin.getConfigHandler().getConfig();
+                if (config == null || config.conversionSettings == null || !config.conversionSettings.enabled) {
+                    player.sendMessage(ColorParser.of(Translation.of("commands.killcash.convert.disabled")).build());
+                    return;
+                }
+
+                Double amountToConvert = args.getByClassOrDefault("amount", Double.class, null);
+                if (amountToConvert == null || amountToConvert <= 0) {
+                    player.sendMessage(ColorParser.of(Translation.of("commands.killcash.convert.invalid-amount")).build());
+                    return;
+                }
+
+                double minConvert = config.conversionSettings.minimumConversion;
+                if (amountToConvert < minConvert) {
+                    player.sendMessage(ColorParser.of(Translation.of("commands.killcash.convert.min-amount"))
+                        .with("min", String.format("%.2f", minConvert))
+                        .build());
+                    return;
+                }
+
+                // 1. Check if player has enough internal KillCash balance
+                var economy = plugin.getHookManager().getEconomyProvider();
+                double currentKillCash = economy.getBalance(player);
+                if (currentKillCash < amountToConvert) {
+                    player.sendMessage(ColorParser.of(Translation.of("commands.killcash.convert.insufficient-funds"))
+                        .with("amount", String.format("%.2f", amountToConvert))
+                        .with("balance", String.format("%.2f", currentKillCash))
+                        .build());
+                    return;
+                }
+
+                // 2. Check if Vault is loaded/available
+                if (!com.lunatech.killcash.hook.Hook.Vault.isLoaded()) {
+                    player.sendMessage(ColorParser.of(Translation.of("commands.killcash.convert.vault-error")).build());
+                    return;
+                }
+                var vaultHook = com.lunatech.killcash.hook.Hook.getVaultHook();
+                if (!vaultHook.isEconomyLoaded()) {
+                    player.sendMessage(ColorParser.of(Translation.of("commands.killcash.convert.vault-error")).build());
+                    return;
+                }
+
+                // 3. Calculate EssentialsX payout
+                double rate = config.conversionSettings.exchangeRate;
+                double essentialsPayout = amountToConvert * rate;
+
+                // 4. Execute transaction (deduct KillCash first, then deposit Vault)
+                boolean withdrawSuccess = economy.withdraw(player, amountToConvert);
+                if (withdrawSuccess) {
+                    boolean depositSuccess = vaultHook.deposit(player, essentialsPayout);
+                    if (depositSuccess) {
+                        player.sendMessage(ColorParser.of(Translation.of("commands.killcash.convert.success"))
+                            .with("amount", String.format("%.2f", amountToConvert))
+                            .with("payout", String.format("%.2f", essentialsPayout))
+                            .build());
+                    } else {
+                        // Rollback on failure
+                        economy.deposit(player, amountToConvert);
+                        player.sendMessage(ColorParser.of(Translation.of("commands.killcash.convert.error-processing")).build());
+                    }
+                } else {
+                    player.sendMessage(ColorParser.of(Translation.of("commands.killcash.convert.error-processing")).build());
                 }
             });
     }

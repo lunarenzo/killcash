@@ -124,4 +124,19 @@ public class PluginConfig implements VersionedConfig {
             public long minPlaytime = 300; // 5 minutes
         }
     }
+
+    @Comment("Currency Conversion Settings")
+    public ConversionSettings conversionSettings = new ConversionSettings();
+
+    @ConfigSerializable
+    public static class ConversionSettings {
+        @Comment("Enable or disable currency conversion from KillCash to main server economy")
+        public boolean enabled = true;
+
+        @Comment("Exchange rate: how many server economy dollars you get per 1 KillCash token")
+        public double exchangeRate = 100.0;
+
+        @Comment("Minimum amount of KillCash a player can convert at once")
+        public double minimumConversion = 1.0;
+    }
 }

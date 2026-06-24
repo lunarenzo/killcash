@@ -50,4 +50,30 @@ public final class PDCUtil {
         int current = getInt(holder, key, 0);
         setInt(holder, key, current + amount);
     }
+
+    /**
+     * Gets a double value from a holder's container.
+     *
+     * @param holder       the data holder (e.g. Player)
+     * @param key          the namespaced key
+     * @param defaultValue the default value if not set
+     * @return the double value, or default
+     */
+    public static double getDouble(PersistentDataHolder holder, NamespacedKey key, double defaultValue) {
+        PersistentDataContainer pdc = holder.getPersistentDataContainer();
+        Double val = pdc.get(key, PersistentDataType.DOUBLE);
+        return val != null ? val : defaultValue;
+    }
+
+    /**
+     * Sets a double value in a holder's container.
+     *
+     * @param holder the data holder
+     * @param key    the namespaced key
+     * @param value  the value to set
+     */
+    public static void setDouble(PersistentDataHolder holder, NamespacedKey key, double value) {
+        PersistentDataContainer pdc = holder.getPersistentDataContainer();
+        pdc.set(key, PersistentDataType.DOUBLE, value);
+    }
 }

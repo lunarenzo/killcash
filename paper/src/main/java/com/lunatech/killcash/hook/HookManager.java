@@ -104,15 +104,14 @@ public class HookManager implements Reloadable {
         return hooks;
     }
 
+    private final EconomyProvider pdcEconomyProvider = new com.lunatech.killcash.hook.impl.PdcEconomyProvider();
+
     /**
      * Resolves the active economy provider.
      *
      * @return the active economy provider, or a no-op fallback
      */
     public EconomyProvider getEconomyProvider() {
-        if (Hook.Vault.isLoaded()) {
-            return (EconomyProvider) Hook.Vault.get();
-        }
-        return new com.lunatech.killcash.hook.impl.NoOpEconomyHook();
+        return pdcEconomyProvider;
     }
 }
