@@ -37,14 +37,14 @@ public class CachedSqlEconomyProvider implements EconomyProvider, Listener {
     public CachedSqlEconomyProvider(AbstractKillCash plugin) {
         this.plugin = plugin;
         this.tableName = DB.getHandler().getDatabaseConfig().getTablePrefix() + "balances";
-        
+    }
+
+    public void start() {
         setupTable();
         startFlushTask();
-        
-        plugin.getServer().getPluginManager().registerEvents(this, plugin);
 
         // Pre-load online players if plugin is reloaded
-        for (Player player : plugin.getServer().getOnlinePlayers()) {
+        for (org.bukkit.entity.Player player : plugin.getServer().getOnlinePlayers()) {
             loadPlayerBalanceAsync(player.getUniqueId(), player);
         }
     }

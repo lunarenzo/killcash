@@ -79,11 +79,18 @@ public class HookManager implements Reloadable {
         String backend = config != null && config.storage != null ? config.storage.backend : "PDC";
         
         if ("DATABASE".equalsIgnoreCase(backend) || "SQLITE".equalsIgnoreCase(backend) || "MYSQL".equalsIgnoreCase(backend)) {
-            this.activeEconomyProvider = new com.lunatech.killcash.hook.impl.CachedSqlEconomyProvider(plugin);
+            var cachedSql = new com.lunatech.killcash.hook.impl.CachedSqlEconomyProvider(plugin);
+            cachedSql.start();
+            this.activeEconomyProvider = cachedSql;
             Logger.get().info(ColorParser.of("<green>Using DATABASE (SQL Cache) storage backend for player balances.</green>").build());
         } else {
             this.activeEconomyProvider = new com.lunatech.killcash.hook.impl.PdcEconomyProvider(plugin);
             Logger.get().info(ColorParser.of("<green>Using PDC (player NBT) storage backend for player balances.</green>").build());
+        }
+
+        // Register economy provider event listener if applicable
+        if (activeEconomyProvider instanceof Listener listener) {
+            Bukkit.getPluginManager().registerEvents(listener, plugin);
         }
 
         for (AbstractHook hook : getHooks().values()) {

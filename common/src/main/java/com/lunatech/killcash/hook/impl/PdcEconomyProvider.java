@@ -27,7 +27,6 @@ public class PdcEconomyProvider implements EconomyProvider, Listener {
 
     public PdcEconomyProvider(AbstractKillCash plugin) {
         this.plugin = plugin;
-        plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
