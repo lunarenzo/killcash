@@ -255,6 +255,10 @@ public class DefaultKillRewardService implements KillRewardService, Reloadable {
         final double finalReward = (baseReward * permissionMultiplier * streakMultiplier) + shutdownBonus;
 
         // Visual & Audio feedback
+        if (settings.lightningKillEffect) {
+            messageService.playLightningEffect(killer, victim.getLocation());
+        }
+
         if (killstreakEnabled) {
             double finalStreakMultiplier = streakMultiplier;
             if (settings.killstreakSettings.showActionBar) {

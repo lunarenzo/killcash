@@ -68,4 +68,12 @@ public interface MessageService {
      * @param pitch the pitch of the sound
      */
     void broadcastSound(org.bukkit.Sound sound, float volume, float pitch);
+
+    /**
+     * Plays a client-side lightning strike effect visible only to the specified player.
+     *
+     * @param player the player who should see the lightning strike
+     * @param location the location where the lightning strike should appear
+     */
+    void playLightningEffect(Player player, org.bukkit.Location location);
 }

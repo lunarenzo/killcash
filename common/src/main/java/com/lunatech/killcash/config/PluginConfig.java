@@ -76,6 +76,9 @@ public class PluginConfig implements VersionedConfig {
             "10", 1.5
         );
 
+        @Comment("Enable client-side lightning strike visual effect for the killer when they kill a player")
+        public boolean lightningKillEffect = true;
+
         @Comment("Killstreak settings")
         public KillstreakSettings killstreakSettings = new KillstreakSettings();
 
