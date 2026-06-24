@@ -27,16 +27,6 @@ public class HookManager implements Reloadable {
      */
     @Override
     public void onLoad(AbstractKillCash plugin) {
-        var config = plugin.getConfigHandler().getConfig();
-        String backend = config != null && config.storage != null ? config.storage.backend : "PDC";
-        
-        if ("DATABASE".equalsIgnoreCase(backend) || "SQLITE".equalsIgnoreCase(backend) || "MYSQL".equalsIgnoreCase(backend)) {
-            this.activeEconomyProvider = new com.lunatech.killcash.hook.impl.CachedSqlEconomyProvider(plugin);
-            Logger.get().info(ColorParser.of("<green>Using DATABASE (SQL Cache) storage backend for player balances.</green>").build());
-        } else {
-            this.activeEconomyProvider = new com.lunatech.killcash.hook.impl.PdcEconomyProvider(plugin);
-            Logger.get().info(ColorParser.of("<green>Using PDC (player NBT) storage backend for player balances.</green>").build());
-        }
         for (Hook hook : Hook.values()) {
             try {
                 if (hook.getPluginName() != null && Bukkit.getPluginManager().getPlugin(hook.getPluginName()) == null) {
@@ -85,6 +75,17 @@ public class HookManager implements Reloadable {
      */
     @Override
     public void onEnable(AbstractKillCash plugin) {
+        var config = plugin.getConfigHandler().getConfig();
+        String backend = config != null && config.storage != null ? config.storage.backend : "PDC";
+        
+        if ("DATABASE".equalsIgnoreCase(backend) || "SQLITE".equalsIgnoreCase(backend) || "MYSQL".equalsIgnoreCase(backend)) {
+            this.activeEconomyProvider = new com.lunatech.killcash.hook.impl.CachedSqlEconomyProvider(plugin);
+            Logger.get().info(ColorParser.of("<green>Using DATABASE (SQL Cache) storage backend for player balances.</green>").build());
+        } else {
+            this.activeEconomyProvider = new com.lunatech.killcash.hook.impl.PdcEconomyProvider(plugin);
+            Logger.get().info(ColorParser.of("<green>Using PDC (player NBT) storage backend for player balances.</green>").build());
+        }
+
         for (AbstractHook hook : getHooks().values()) {
             hook.onEnable(plugin);
 
