@@ -43,6 +43,14 @@ public interface MessageService {
     void broadcast(String translationKey, Map<String, String> placeholders);
 
     /**
+     * Broadcasts a raw message (already formatted or read from configuration) to the server with placeholders replaced.
+     *
+     * @param message the raw message
+     * @param placeholders mapping of placeholder keys to replacement values
+     */
+    void broadcastRaw(String message, Map<String, String> placeholders);
+
+    /**
      * Plays a sound for a player.
      *
      * @param player the player

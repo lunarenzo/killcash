@@ -267,7 +267,11 @@ public class DefaultKillRewardService implements KillRewardService, Reloadable {
             if (settings.streakAnnouncements != null && settings.streakAnnouncements.containsKey(String.valueOf(newStreak))) {
                 String announcement = settings.streakAnnouncements.get(String.valueOf(newStreak));
                 if (announcement != null) {
-                    messageService.broadcast(announcement, Map.of("player", killer.getName()));
+                    messageService.broadcastRaw(announcement, Map.of(
+                        "player", killer.getName(),
+                        "killer", killer.getName(),
+                        "streak", String.valueOf(newStreak)
+                    ));
                     messageService.broadcastSound(org.bukkit.Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 1.0f, 1.0f);
                 }
             }

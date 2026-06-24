@@ -46,6 +46,15 @@ public class PaperMessageService implements MessageService {
     }
 
     @Override
+    public void broadcastRaw(String message, Map<String, String> placeholders) {
+        var parser = ColorParser.of(message);
+        for (Map.Entry<String, String> entry : placeholders.entrySet()) {
+            parser.with(entry.getKey(), entry.getValue());
+        }
+        org.bukkit.Bukkit.broadcast(parser.build());
+    }
+
+    @Override
     public void playSound(Player player, org.bukkit.Sound sound, float volume, float pitch) {
         player.playSound(player.getLocation(), sound, volume, pitch);
     }
