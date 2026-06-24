@@ -7,7 +7,7 @@
   },
   "commands": {
     "killcash": {
-      "help": "\n<green>--- KillCash Help ---</green>\n<gold>/killcash stats [player]</gold> - <gray>View player statistics</gray>\n<gold>/killcash balance [player]</gold> - <gray>View player economy balance</gray>\n<gold>/killcash pay <player> <amount></gold> - <gray>Pay another player</gray>\n<gold>/killcash baltop</gold> - <gray>View top 10 player balances</gray>\n<gold>/killcash reload [config|lang|all]</gold> - <gray>Reload plugin</gray>\n",
+      "help": "\n<green>--- KillCash Help ---</green>\n<gold>/killcash stats [player]</gold> - <gray>View player statistics</gray>\n<gold>/killcash balance [player]</gold> - <gray>View player economy balance</gray>\n<gold>/killcash pay <player> <amount></gold> - <gray>Pay another player</gray>\n<gold>/killcash baltop</gold> - <gray>View top 10 player balances</gray>\n<gold>/killcash give <player(s)/all/*> <amount></gold> - <gray>Give currency to player(s)</gray>\n<gold>/killcash take <player(s)/all/*> <amount></gold> - <gray>Take currency from player(s)</gray>\n<gold>/killcash reload [config|lang|all]</gold> - <gray>Reload plugin</gray>\n",
       "only-players": "<red>This command can only be executed by players.</red>",
       "stats": {
         "self": "\n<green>--- Your PvP Statistics ---</green>\n<gray>Balance:</gray> <gold>$<balance></gold>\n<gray>Kills:</gray> <white><kills></white>\n<gray>Deaths:</gray> <white><deaths></white>\n<gray>Killstreak:</gray> <white><streak></white>\n",
@@ -30,6 +30,18 @@
       "baltop": {
         "header": "\n<green>--- KillCash Leaderboard (Top 10) ---</green>\n",
         "entry": "<gray><pos>.</gray> <white><player></white> - <gold>$<balance></gold>"
+      },
+      "give": {
+        "success-sender": "<green>Successfully gave <gold>$<amount></gold> to <white><target></white>.</green>",
+        "success-receiver": "<green>You received <gold>$<amount></gold> from an admin.</green>",
+        "invalid-amount": "<red>The amount must be a positive number.</red>",
+        "no-players": "<red>No online players found to give money to.</red>"
+      },
+      "take": {
+        "success-sender": "<green>Successfully took <gold>$<amount></gold> from <white><target></white>.</green>",
+        "success-receiver": "<red>An admin took <gold>$<amount></gold> from your balance.</red>",
+        "invalid-amount": "<red>The amount must be a positive number.</red>",
+        "no-players": "<red>No online players found to take money from.</red>"
       },
       "reload": {
         "success": "<green>Successfully reloaded KillCash configuration and translations!</green>",

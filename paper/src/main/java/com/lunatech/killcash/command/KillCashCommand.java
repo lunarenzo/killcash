@@ -43,6 +43,8 @@ final class KillCashCommand extends Command {
                 commandBalance(),
                 commandPay(),
                 commandBaltop(),
+                commandGive(),
+                commandTake(),
                 commandReload(),
                 commandReloadConfig(),
                 commandReloadLang(),
@@ -388,6 +390,192 @@ final class KillCashCommand extends Command {
                         .with("pos", String.valueOf(i + 1))
                         .with("player", entry.name())
                         .with("balance", String.format("%.2f", entry.balance()))
+                        .build());
+                }
+            });
+    }
+
+    private CommandAPICommand commandGive() {
+        return new CommandAPICommand("give")
+            .withHelp("Give killcash currency to players.", "Give killcash currency to players.")
+            .withPermission(BASE_PERM + ".give")
+            .withArguments(
+                new StringArgument("target")
+                    .replaceSuggestions(ArgumentSuggestions.stringCollection(unused -> {
+                        List<String> suggestions = new ArrayList<>();
+                        suggestions.add("all");
+                        suggestions.add("*");
+                        plugin.getServer().getOnlinePlayers().forEach(p -> suggestions.add(p.getName()));
+                        return suggestions;
+                    })),
+                new DoubleArgument("amount", 0.01)
+            )
+            .executes((sender, args) -> {
+                String targetStr = args.getByClassOrDefault("target", String.class, null);
+                Double amount = args.getByClassOrDefault("amount", Double.class, null);
+                if (targetStr == null || amount == null) return;
+
+                if (amount <= 0) {
+                    sender.sendMessage(ColorParser.of(Translation.of("commands.killcash.give.invalid-amount")).build());
+                    return;
+                }
+
+                var economy = plugin.getHookManager().getEconomyProvider();
+                if (targetStr.equalsIgnoreCase("all") || targetStr.equals("*")) {
+                    var onlinePlayers = plugin.getServer().getOnlinePlayers();
+                    if (onlinePlayers.isEmpty()) {
+                        sender.sendMessage(ColorParser.of(Translation.of("commands.killcash.give.no-players")).build());
+                        return;
+                    }
+                    for (Player onlinePlayer : onlinePlayers) {
+                        economy.deposit(onlinePlayer, amount);
+                        onlinePlayer.sendMessage(ColorParser.of(Translation.of("commands.killcash.give.success-receiver"))
+                            .with("amount", String.format("%.2f", amount))
+                            .build());
+                    }
+                    sender.sendMessage(ColorParser.of(Translation.of("commands.killcash.give.success-sender"))
+                        .with("amount", String.format("%.2f", amount))
+                        .with("target", "all online players")
+                        .build());
+                } else if (targetStr.contains(",")) {
+                    String[] names = targetStr.split(",");
+                    List<String> processedNames = new ArrayList<>();
+                    for (String name : names) {
+                        name = name.trim();
+                        if (name.isEmpty()) continue;
+                        OfflinePlayer target = resolvePlayer(name);
+                        String resolvedName = target.getName();
+                        if (resolvedName == null || (!target.hasPlayedBefore() && plugin.getServer().getPlayer(resolvedName) == null)) {
+                            sender.sendMessage(ColorParser.of(Translation.of("commands.killcash.stats.player-not-found"))
+                                .with("player", name)
+                                .build());
+                            continue;
+                        }
+                        economy.deposit(target, amount);
+                        processedNames.add(resolvedName);
+                        if (target.isOnline() && target.getPlayer() != null) {
+                            target.getPlayer().sendMessage(ColorParser.of(Translation.of("commands.killcash.give.success-receiver"))
+                                .with("amount", String.format("%.2f", amount))
+                                .build());
+                        }
+                    }
+                    if (!processedNames.isEmpty()) {
+                        sender.sendMessage(ColorParser.of(Translation.of("commands.killcash.give.success-sender"))
+                            .with("amount", String.format("%.2f", amount))
+                            .with("target", String.join(", ", processedNames))
+                            .build());
+                    }
+                } else {
+                    OfflinePlayer target = resolvePlayer(targetStr);
+                    String resolvedName = target.getName();
+                    if (resolvedName == null || (!target.hasPlayedBefore() && plugin.getServer().getPlayer(resolvedName) == null)) {
+                        sender.sendMessage(ColorParser.of(Translation.of("commands.killcash.stats.player-not-found"))
+                            .with("player", targetStr)
+                            .build());
+                        return;
+                    }
+                    economy.deposit(target, amount);
+                    if (target.isOnline() && target.getPlayer() != null) {
+                        target.getPlayer().sendMessage(ColorParser.of(Translation.of("commands.killcash.give.success-receiver"))
+                            .with("amount", String.format("%.2f", amount))
+                            .build());
+                    }
+                    sender.sendMessage(ColorParser.of(Translation.of("commands.killcash.give.success-sender"))
+                        .with("amount", String.format("%.2f", amount))
+                        .with("target", resolvedName)
+                        .build());
+                }
+            });
+    }
+
+    private CommandAPICommand commandTake() {
+        return new CommandAPICommand("take")
+            .withHelp("Take killcash currency from players.", "Take killcash currency from players.")
+            .withPermission(BASE_PERM + ".take")
+            .withArguments(
+                new StringArgument("target")
+                    .replaceSuggestions(ArgumentSuggestions.stringCollection(unused -> {
+                        List<String> suggestions = new ArrayList<>();
+                        suggestions.add("all");
+                        suggestions.add("*");
+                        plugin.getServer().getOnlinePlayers().forEach(p -> suggestions.add(p.getName()));
+                        return suggestions;
+                    })),
+                new DoubleArgument("amount", 0.01)
+            )
+            .executes((sender, args) -> {
+                String targetStr = args.getByClassOrDefault("target", String.class, null);
+                Double amount = args.getByClassOrDefault("amount", Double.class, null);
+                if (targetStr == null || amount == null) return;
+
+                if (amount <= 0) {
+                    sender.sendMessage(ColorParser.of(Translation.of("commands.killcash.take.invalid-amount")).build());
+                    return;
+                }
+
+                var economy = plugin.getHookManager().getEconomyProvider();
+                if (targetStr.equalsIgnoreCase("all") || targetStr.equals("*")) {
+                    var onlinePlayers = plugin.getServer().getOnlinePlayers();
+                    if (onlinePlayers.isEmpty()) {
+                        sender.sendMessage(ColorParser.of(Translation.of("commands.killcash.take.no-players")).build());
+                        return;
+                    }
+                    for (Player onlinePlayer : onlinePlayers) {
+                        economy.withdraw(onlinePlayer, amount);
+                        onlinePlayer.sendMessage(ColorParser.of(Translation.of("commands.killcash.take.success-receiver"))
+                            .with("amount", String.format("%.2f", amount))
+                            .build());
+                    }
+                    sender.sendMessage(ColorParser.of(Translation.of("commands.killcash.take.success-sender"))
+                        .with("amount", String.format("%.2f", amount))
+                        .with("target", "all online players")
+                        .build());
+                } else if (targetStr.contains(",")) {
+                    String[] names = targetStr.split(",");
+                    List<String> processedNames = new ArrayList<>();
+                    for (String name : names) {
+                        name = name.trim();
+                        if (name.isEmpty()) continue;
+                        OfflinePlayer target = resolvePlayer(name);
+                        String resolvedName = target.getName();
+                        if (resolvedName == null || (!target.hasPlayedBefore() && plugin.getServer().getPlayer(resolvedName) == null)) {
+                            sender.sendMessage(ColorParser.of(Translation.of("commands.killcash.stats.player-not-found"))
+                                .with("player", name)
+                                .build());
+                            continue;
+                        }
+                        economy.withdraw(target, amount);
+                        processedNames.add(resolvedName);
+                        if (target.isOnline() && target.getPlayer() != null) {
+                            target.getPlayer().sendMessage(ColorParser.of(Translation.of("commands.killcash.take.success-receiver"))
+                                .with("amount", String.format("%.2f", amount))
+                                .build());
+                        }
+                    }
+                    if (!processedNames.isEmpty()) {
+                        sender.sendMessage(ColorParser.of(Translation.of("commands.killcash.take.success-sender"))
+                            .with("amount", String.format("%.2f", amount))
+                            .with("target", String.join(", ", processedNames))
+                            .build());
+                    }
+                } else {
+                    OfflinePlayer target = resolvePlayer(targetStr);
+                    String resolvedName = target.getName();
+                    if (resolvedName == null || (!target.hasPlayedBefore() && plugin.getServer().getPlayer(resolvedName) == null)) {
+                        sender.sendMessage(ColorParser.of(Translation.of("commands.killcash.stats.player-not-found"))
+                            .with("player", targetStr)
+                            .build());
+                        return;
+                    }
+                    economy.withdraw(target, amount);
+                    if (target.isOnline() && target.getPlayer() != null) {
+                        target.getPlayer().sendMessage(ColorParser.of(Translation.of("commands.killcash.take.success-receiver"))
+                            .with("amount", String.format("%.2f", amount))
+                            .build());
+                    }
+                    sender.sendMessage(ColorParser.of(Translation.of("commands.killcash.take.success-sender"))
+                        .with("amount", String.format("%.2f", amount))
+                        .with("target", resolvedName)
                         .build());
                 }
             });
