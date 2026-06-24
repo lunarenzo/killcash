@@ -95,6 +95,9 @@ public class PluginConfig implements VersionedConfig {
 
             @Comment("Whether to send action bar messages showing active streak and multiplier")
             public boolean showActionBar = true;
+
+            @Comment("Whether to send personal chat messages notifying players of their active streak")
+            public boolean showStreakChat = true;
         }
 
         @Comment("Server-wide announcements for major killstreak milestones.")

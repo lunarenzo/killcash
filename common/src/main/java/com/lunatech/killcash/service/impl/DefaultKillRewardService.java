@@ -301,7 +301,9 @@ public class DefaultKillRewardService implements KillRewardService, Reloadable {
 
                         if (killstreakEnabled) {
                             // Notify killer of their current streak
-                            messageService.sendMessage(killer, "pvp.streak-active", Map.of("streak", String.valueOf(finalNewStreak)));
+                            if (settings.killstreakSettings.showStreakChat) {
+                                messageService.sendMessage(killer, "pvp.streak-active", Map.of("streak", String.valueOf(finalNewStreak)));
+                            }
 
                             if (finalShutdownBonus > 0) {
                                 messageService.broadcast("pvp.shutdown", Map.of(
