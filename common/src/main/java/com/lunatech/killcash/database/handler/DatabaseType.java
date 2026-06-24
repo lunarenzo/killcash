@@ -257,7 +257,8 @@ public enum DatabaseType {
      */
     public String getConnectionInitSql() {
         return switch (this) {
-            case SQLITE, H2 -> "";
+            case SQLITE -> "PRAGMA journal_mode=WAL; PRAGMA synchronous=NORMAL; PRAGMA busy_timeout=5000;";
+            case H2 -> "";
             case MYSQL -> "SET NAMES utf8mb4 COLLATE utf8mb4_bin; " + setSqlModes(
                 // MySQL defaults
                 "STRICT_TRANS_TABLES",

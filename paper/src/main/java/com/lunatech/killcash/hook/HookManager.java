@@ -16,6 +16,7 @@ import java.util.HashMap;
 public class HookManager implements Reloadable {
     private final HashMap<Class<? extends AbstractHook>, AbstractHook> hooks = new HashMap<>();
     private final KillCash plugin;
+    private EconomyProvider cachedSqlEconomyProvider;
 
     public HookManager(KillCash plugin) {
         this.plugin = plugin;
@@ -26,6 +27,7 @@ public class HookManager implements Reloadable {
      */
     @Override
     public void onLoad(AbstractKillCash plugin) {
+        this.cachedSqlEconomyProvider = new com.lunatech.killcash.hook.impl.CachedSqlEconomyProvider(plugin);
         for (Hook hook : Hook.values()) {
             try {
                 if (hook.getPluginName() != null && Bukkit.getPluginManager().getPlugin(hook.getPluginName()) == null) {
@@ -88,6 +90,9 @@ public class HookManager implements Reloadable {
      */
     @Override
     public void onDisable(AbstractKillCash plugin) {
+        if (cachedSqlEconomyProvider instanceof com.lunatech.killcash.hook.impl.CachedSqlEconomyProvider cachedSql) {
+            cachedSql.shutdown();
+        }
         for (AbstractHook hook : getHooks().values()) {
             hook.onDisable(plugin);
         }
@@ -104,14 +109,15 @@ public class HookManager implements Reloadable {
         return hooks;
     }
 
-    private final EconomyProvider pdcEconomyProvider = new com.lunatech.killcash.hook.impl.PdcEconomyProvider();
-
     /**
      * Resolves the active economy provider.
      *
      * @return the active economy provider, or a no-op fallback
      */
     public EconomyProvider getEconomyProvider() {
-        return pdcEconomyProvider;
+        if (cachedSqlEconomyProvider == null) {
+            return new com.lunatech.killcash.hook.impl.NoOpEconomyHook();
+        }
+        return cachedSqlEconomyProvider;
     }
 }
