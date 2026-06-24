@@ -96,10 +96,39 @@ public class PaperMessageService implements MessageService {
             lightningClass.getMethod("setPos", double.class, double.class, double.class)
                 .invoke(lightningEntity, location.getX(), location.getY(), location.getZ());
 
-            Class<?> entityClass = Class.forName("net.minecraft.world.entity.Entity");
             Class<?> packetClass = Class.forName("net.minecraft.network.protocol.game.ClientboundAddEntityPacket");
-            java.lang.reflect.Constructor<?> packetConstructor = packetClass.getConstructor(entityClass);
-            Object packet = packetConstructor.newInstance(lightningEntity);
+            Object packet = null;
+
+            // Search for a suitable constructor in ClientboundAddEntityPacket
+            for (java.lang.reflect.Constructor<?> constructor : packetClass.getDeclaredConstructors()) {
+                Class<?>[] params = constructor.getParameterTypes();
+                if (params.length == 11 && params[0] == int.class && params[1] == java.util.UUID.class) {
+                    constructor.setAccessible(true);
+                    Object zeroVelocity = Class.forName("net.minecraft.world.phys.Vec3").getField("ZERO").get(null);
+                    Object headYawVal = (params[10] == float.class) ? 0.0f : 0.0;
+                    packet = constructor.newInstance(
+                        java.util.concurrent.ThreadLocalRandom.current().nextInt(100000, 999999),
+                        java.util.UUID.randomUUID(),
+                        location.getX(),
+                        location.getY(),
+                        location.getZ(),
+                        0.0f,
+                        0.0f,
+                        lightningType,
+                        0,
+                        zeroVelocity,
+                        headYawVal
+                    );
+                    break;
+                }
+            }
+
+            if (packet == null) {
+                // Fallback to Entity-based constructor (for older Minecraft versions)
+                Class<?> entityClass = Class.forName("net.minecraft.world.entity.Entity");
+                java.lang.reflect.Constructor<?> entityConstructor = packetClass.getConstructor(entityClass);
+                packet = entityConstructor.newInstance(lightningEntity);
+            }
 
             Class<?> craftPlayerClass = getCraftClass("entity.CraftPlayer");
             Object craftPlayer = craftPlayerClass.cast(player);
@@ -116,9 +145,22 @@ public class PaperMessageService implements MessageService {
             Class<?> basePacketClass = Class.forName("net.minecraft.network.protocol.Packet");
             connection.getClass().getMethod("send", basePacketClass).invoke(connection, packet);
         } catch (Throwable t) {
-            // Failsafe: Play flash particle and thunder sound
-            player.spawnParticle(org.bukkit.Particle.FLASH, location, 1);
-            player.playSound(location, org.bukkit.Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 1.0f, 1.0f);
+            try {
+                // Failsafe: Play flash/thunder effect safely depending on platform version requirements
+                try {
+                    player.spawnParticle(org.bukkit.Particle.FLASH, location, 1, org.bukkit.Color.WHITE);
+                } catch (Throwable t1) {
+                    try {
+                        player.spawnParticle(org.bukkit.Particle.FLASH, location, 1);
+                    } catch (Throwable t2) {
+                        player.spawnParticle(org.bukkit.Particle.CRIT, location, 10, 0.5, 2.0, 0.5, 0.1);
+                    }
+                }
+                // Play thunder sound
+                player.playSound(location, org.bukkit.Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 1.0f, 1.0f);
+            } catch (Throwable t3) {
+                // Fail-silent: Ensure the main logic of the event handler is never disrupted
+            }
         }
     }
 }
