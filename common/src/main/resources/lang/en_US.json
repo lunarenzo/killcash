@@ -61,6 +61,7 @@
     "anti-abuse-playtime": "<red>Victim <white><victim></white> does not have enough playtime. No reward issued.",
     "streak-active": "<green>You are currently on a <gold><streak></gold> killstreak!",
     "shutdown": "<red><bold>SHUTDOWN!</bold></red> <yellow>You ended <gold><victim>'s</gold> <white><streak>-kill</white> streak and earned a <green>+$<bonus></green> Bonus!</yellow>",
-    "action-bar": "<gold>Active Streak: <yellow><streak></yellow> <dark_gray>(<green><multiplier>x Cash</green>)</dark_gray></gold>"
+    "action-bar": "<gold>Active Streak: <yellow><streak></yellow> <dark_gray>(<green><multiplier>x Cash</green>)</dark_gray></gold>",
+    "streak-decayed": "<red>Your killstreak has decayed to <white><streak></white> due to inactivity!</red>"
   }
 }

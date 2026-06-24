@@ -133,7 +133,7 @@ public class DefaultKillRewardService implements KillRewardService, Reloadable {
                         } else {
                             lastKillTimes.put(uuid, System.currentTimeMillis() - (decayTime - 10 + (excess % 10)) * 1000);
                         }
-                        player.sendMessage(io.github.milkdrinkers.colorparser.paper.ColorParser.of("<red>Your killstreak has decayed to <white>" + newStreak + "</white> due to inactivity!</red>").build());
+                        messageService.sendMessage(player, "pvp.streak-decayed", Map.of("streak", String.valueOf(newStreak)));
                     }
                 }).execute();
             }
