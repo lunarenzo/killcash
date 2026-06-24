@@ -139,4 +139,13 @@ public class PluginConfig implements VersionedConfig {
         @Comment("Minimum amount of KillCash a player can convert at once")
         public double minimumConversion = 1.0;
     }
+
+    @Comment("Storage Settings")
+    public StorageSettings storage = new StorageSettings();
+
+    @ConfigSerializable
+    public static class StorageSettings {
+        @Comment("Storage backend to use for player balances. Options: PDC (standard vanilla player NBT files), DATABASE (SQLite/MySQL database). Default: PDC")
+        public String backend = "PDC";
+    }
 }
