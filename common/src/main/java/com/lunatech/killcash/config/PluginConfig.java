@@ -81,6 +81,9 @@ public class PluginConfig implements VersionedConfig {
 
         @ConfigSerializable
         public static class KillstreakSettings {
+            @Comment("Enable or disable the overall killstreak system")
+            public boolean enabled = true;
+
             @Comment("If true, streaks apply to the next bracket up (e.g., streak of 4 gets 3's multiplier)")
             public boolean useRangeSystem = true;
 

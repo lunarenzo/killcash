@@ -65,6 +65,11 @@ public class DefaultKillRewardService implements KillRewardService, Reloadable {
 
     @Override
     public void handleJoin(Player player) {
+        PluginConfig.PvpReward settings = configHandler.getConfig().pvpReward;
+        if (settings == null || settings.killstreakSettings == null || !settings.killstreakSettings.enabled) {
+            return;
+        }
+
         java.util.UUID uuid = player.getUniqueId();
         Long logoutTime = logoutTimes.remove(uuid);
         if (logoutTime != null) {
@@ -88,6 +93,11 @@ public class DefaultKillRewardService implements KillRewardService, Reloadable {
 
     @Override
     public void handleQuit(Player player) {
+        PluginConfig.PvpReward settings = configHandler.getConfig().pvpReward;
+        if (settings == null || settings.killstreakSettings == null || !settings.killstreakSettings.enabled) {
+            return;
+        }
+
         java.util.UUID uuid = player.getUniqueId();
         logoutTimes.put(uuid, System.currentTimeMillis());
     }
@@ -97,7 +107,7 @@ public class DefaultKillRewardService implements KillRewardService, Reloadable {
         logoutTimes.entrySet().removeIf(entry -> (now - entry.getValue()) > 5 * 60 * 1000);
 
         PluginConfig.PvpReward settings = configHandler.getConfig().pvpReward;
-        if (settings == null || settings.killstreakSettings == null) return;
+        if (settings == null || settings.killstreakSettings == null || !settings.killstreakSettings.enabled) return;
         long decayTime = settings.killstreakSettings.decayTime;
         if (decayTime <= 0) return;
 
@@ -177,19 +187,24 @@ public class DefaultKillRewardService implements KillRewardService, Reloadable {
             return;
         }
 
-        int victimStreak = PDCUtil.getInt(victim, PDCKeys.STREAK, 0);
+        int victimStreak = 0;
+        int newStreak = 1;
+        boolean killstreakEnabled = settings.killstreakSettings != null && settings.killstreakSettings.enabled;
+
+        if (killstreakEnabled) {
+            victimStreak = PDCUtil.getInt(victim, PDCKeys.STREAK, 0);
+            PDCUtil.incrementInt(killer, PDCKeys.STREAK, 1);
+            PDCUtil.setInt(victim, PDCKeys.STREAK, 0);
+            newStreak = PDCUtil.getInt(killer, PDCKeys.STREAK, 1);
+
+            long currentTime = System.currentTimeMillis();
+            lastKillTimes.put(killer.getUniqueId(), currentTime);
+            lastKillTimes.remove(victim.getUniqueId());
+        }
 
         // Update player statistics in PDC (must be done on the regional tick thread)
         PDCUtil.incrementInt(killer, PDCKeys.KILLS, 1);
-        PDCUtil.incrementInt(killer, PDCKeys.STREAK, 1);
         PDCUtil.incrementInt(victim, PDCKeys.DEATHS, 1);
-        PDCUtil.setInt(victim, PDCKeys.STREAK, 0);
-
-        int newStreak = PDCUtil.getInt(killer, PDCKeys.STREAK, 1);
-
-        long currentTime = System.currentTimeMillis();
-        lastKillTimes.put(killer.getUniqueId(), currentTime);
-        lastKillTimes.remove(victim.getUniqueId());
 
         // Calculate base reward amount
         double min = settings.minReward;
@@ -211,8 +226,8 @@ public class DefaultKillRewardService implements KillRewardService, Reloadable {
 
         // Apply streak multipliers
         double streakMultiplier = 1.0;
-        if (settings.streakMultipliers != null) {
-            if (settings.killstreakSettings != null && settings.killstreakSettings.useRangeSystem) {
+        if (killstreakEnabled && settings.streakMultipliers != null) {
+            if (settings.killstreakSettings.useRangeSystem) {
                 int highestConfiguredStreak = 0;
                 for (java.util.Map.Entry<String, Double> entry : settings.streakMultipliers.entrySet()) {
                     try {
@@ -233,26 +248,28 @@ public class DefaultKillRewardService implements KillRewardService, Reloadable {
 
         // Calculate shutdown bonus
         double shutdownBonus = 0.0;
-        if (victimStreak >= 3 && settings.killstreakSettings != null && settings.killstreakSettings.shutdownBonusPerKill > 0) {
+        if (killstreakEnabled && victimStreak >= 3 && settings.killstreakSettings.shutdownBonusPerKill > 0) {
             shutdownBonus = victimStreak * settings.killstreakSettings.shutdownBonusPerKill;
         }
 
         final double finalReward = (baseReward * permissionMultiplier * streakMultiplier) + shutdownBonus;
 
         // Visual & Audio feedback
-        double finalStreakMultiplier = streakMultiplier;
-        messageService.sendActionBar(killer, "pvp.action-bar", Map.of(
-            "streak", String.valueOf(newStreak),
-            "multiplier", String.format("%.2f", finalStreakMultiplier)
-        ));
-        messageService.playSound(killer, org.bukkit.Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 1.0f);
+        if (killstreakEnabled) {
+            double finalStreakMultiplier = streakMultiplier;
+            messageService.sendActionBar(killer, "pvp.action-bar", Map.of(
+                "streak", String.valueOf(newStreak),
+                "multiplier", String.format("%.2f", finalStreakMultiplier)
+            ));
+            messageService.playSound(killer, org.bukkit.Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 1.0f);
 
-        // Server-wide Announcement Milestones
-        if (settings.streakAnnouncements != null && settings.streakAnnouncements.containsKey(String.valueOf(newStreak))) {
-            String announcement = settings.streakAnnouncements.get(String.valueOf(newStreak));
-            if (announcement != null) {
-                messageService.broadcast(announcement, Map.of("player", killer.getName()));
-                messageService.broadcastSound(org.bukkit.Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 1.0f, 1.0f);
+            // Server-wide Announcement Milestones
+            if (settings.streakAnnouncements != null && settings.streakAnnouncements.containsKey(String.valueOf(newStreak))) {
+                String announcement = settings.streakAnnouncements.get(String.valueOf(newStreak));
+                if (announcement != null) {
+                    messageService.broadcast(announcement, Map.of("player", killer.getName()));
+                    messageService.broadcastSound(org.bukkit.Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 1.0f, 1.0f);
+                }
             }
         }
 
@@ -263,6 +280,8 @@ public class DefaultKillRewardService implements KillRewardService, Reloadable {
 
         // Perform economy operations asynchronously off-thread to avoid blocking tick speed
         double finalShutdownBonus = shutdownBonus;
+        int finalNewStreak = newStreak;
+        int finalVictimStreak = victimStreak;
         Scheduler.async(() -> {
             boolean success = economyProviderSupplier.get().deposit(killer, finalReward);
             if (success) {
@@ -274,15 +293,17 @@ public class DefaultKillRewardService implements KillRewardService, Reloadable {
                                 "victim", victim.getName()
                         ));
 
-                        // Notify killer of their current streak
-                        messageService.sendMessage(killer, "pvp.streak-active", Map.of("streak", String.valueOf(newStreak)));
+                        if (killstreakEnabled) {
+                            // Notify killer of their current streak
+                            messageService.sendMessage(killer, "pvp.streak-active", Map.of("streak", String.valueOf(finalNewStreak)));
 
-                        if (finalShutdownBonus > 0) {
-                            messageService.sendMessage(killer, "pvp.shutdown", Map.of(
-                                "victim", victim.getName(),
-                                "streak", String.valueOf(victimStreak),
-                                "bonus", String.format("%.2f", finalShutdownBonus)
-                            ));
+                            if (finalShutdownBonus > 0) {
+                                messageService.sendMessage(killer, "pvp.shutdown", Map.of(
+                                    "victim", victim.getName(),
+                                    "streak", String.valueOf(finalVictimStreak),
+                                    "bonus", String.format("%.2f", finalShutdownBonus)
+                                ));
+                            }
                         }
                     }
                 }).execute();
