@@ -34,7 +34,7 @@ public class HookManager implements Reloadable {
             this.activeEconomyProvider = new com.lunatech.killcash.hook.impl.CachedSqlEconomyProvider(plugin);
             Logger.get().info(ColorParser.of("<green>Using DATABASE (SQL Cache) storage backend for player balances.</green>").build());
         } else {
-            this.activeEconomyProvider = new com.lunatech.killcash.hook.impl.PdcEconomyProvider();
+            this.activeEconomyProvider = new com.lunatech.killcash.hook.impl.PdcEconomyProvider(plugin);
             Logger.get().info(ColorParser.of("<green>Using PDC (player NBT) storage backend for player balances.</green>").build());
         }
         for (Hook hook : Hook.values()) {
