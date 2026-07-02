@@ -100,17 +100,40 @@ public final class DeathMessageListener implements Listener {
     }
 
     private Component handleMobDeath(Player victim, LivingEntity mob, PluginConfig.DeathMessages config) {
-        List<String> templates = config.mobFormats;
-        if (templates == null || templates.isEmpty()) {
+        String entityType = mob.getType().name();
+        PluginConfig.MobFormatGroup formatGroup = config.mobFormats.get(entityType);
+        if (formatGroup == null) {
+            formatGroup = config.mobFormats.get("DEFAULT");
+        }
+        if (formatGroup == null) {
             return null;
         }
-
-        String template = templates.get(ThreadLocalRandom.current().nextInt(templates.size()));
 
         EntityEquipment equipment = mob.getEquipment();
         ItemStack weapon = equipment != null ? equipment.getItemInMainHand() : null;
         boolean holdingWeapon = weapon != null && weapon.getType() != Material.AIR;
 
+        List<String> templates = holdingWeapon ? formatGroup.weapon : formatGroup.unarmed;
+        // Fallback if the configured list is empty
+        if (templates == null || templates.isEmpty()) {
+            templates = holdingWeapon ? formatGroup.unarmed : formatGroup.weapon;
+        }
+        // Fallback to DEFAULT format group if still empty
+        if (templates == null || templates.isEmpty()) {
+            PluginConfig.MobFormatGroup defaultGroup = config.mobFormats.get("DEFAULT");
+            if (defaultGroup != null) {
+                templates = holdingWeapon ? defaultGroup.weapon : defaultGroup.unarmed;
+                if (templates == null || templates.isEmpty()) {
+                    templates = holdingWeapon ? defaultGroup.unarmed : defaultGroup.weapon;
+                }
+            }
+        }
+
+        if (templates == null || templates.isEmpty()) {
+            return null;
+        }
+
+        String template = templates.get(ThreadLocalRandom.current().nextInt(templates.size()));
         Component mobName = mob.customName() != null ? mob.customName() : Component.translatable(mob.getType().translationKey());
 
         TagResolver baseResolvers = TagResolver.resolver(
@@ -146,12 +169,7 @@ public final class DeathMessageListener implements Listener {
     }
 
     private Component buildHoverableItemComponent(ItemStack item) {
-        Component displayName = item.displayName();
-        Component framedDisplay = Component.empty()
-            .append(Component.text("["))
-            .append(displayName)
-            .append(Component.text("]"));
-
-        return framedDisplay.hoverEvent(item.asHoverEvent());
+        // No manual bracket wrapping here; the server owner can wrap the tag like [<item>] in config.yml
+        return item.displayName().hoverEvent(item.asHoverEvent());
     }
 }

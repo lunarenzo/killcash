@@ -159,8 +159,8 @@ public class PluginConfig implements VersionedConfig {
 
         @Comment("When a player kills another player (PVP)")
         public java.util.List<String> pvpFormats = java.util.List.of(
-            "<red><victim> <gray>was sliced to pieces by <gold><killer> <gray>using <item>",
-            "<gold><killer> <gray>eliminated <red><victim> <gray>via <item> <dark_gray>(Streak: <streak>)"
+            "<red><victim> <gray>was sliced to pieces by <gold><killer> <gray>using [<item>]",
+            "<gold><killer> <gray>eliminated <red><victim> <gray>via [<item>] <dark_gray>(Streak: <streak>)"
         );
 
         @Comment("When a player kills another player using their bare hands")
@@ -168,10 +168,17 @@ public class PluginConfig implements VersionedConfig {
             "<red><victim> <gray>was beaten to a pulp by <gold><killer>'s <gray>bare fists!"
         );
 
-        @Comment("When a player is killed by an entity/mob. Placeholder <killer> holds the entity's display name.")
-        public java.util.List<String> mobFormats = java.util.List.of(
-            "<red><victim> <gray>was slain by <gold><killer> <gray>using <item>",
-            "<red><victim> <gray>was shredded by <gold><killer>"
+        @Comment("Mob-specific death messages. Keys are EntityType names (e.g. CREEPER, ZOMBIE, SKELETON) or DEFAULT. " +
+                 "Formats are divided into 'weapon' (used when the mob holds an item) and 'unarmed' (used when the mob is unarmed).")
+        public java.util.Map<String, MobFormatGroup> mobFormats = java.util.Map.of(
+            "CREEPER", new MobFormatGroup(
+                java.util.List.of(),
+                java.util.List.of("<red><victim> <gray>was blown to smithereens by <gold><killer>!")
+            ),
+            "DEFAULT", new MobFormatGroup(
+                java.util.List.of("<red><victim> <gray>was slain by <gold><killer> <gray>using [<item>]"),
+                java.util.List.of("<red><victim> <gray>was shredded by <gold><killer>")
+            )
         );
 
         @Comment("Natural/Environmental deaths (e.g. FALL, LAVA, VOID, DROWNING, etc.)")
@@ -181,5 +188,21 @@ public class PluginConfig implements VersionedConfig {
             "SUFFOCATION", "<red><victim> <gray>ran out of breathing room.",
             "DEFAULT", "<red><victim> <gray>died mysteriously."
         );
+    }
+
+    @ConfigSerializable
+    public static class MobFormatGroup {
+        @Comment("Templates used when the mob is holding an item")
+        public java.util.List<String> weapon;
+
+        @Comment("Templates used when the mob is unarmed")
+        public java.util.List<String> unarmed;
+
+        public MobFormatGroup() {}
+
+        public MobFormatGroup(java.util.List<String> weapon, java.util.List<String> unarmed) {
+            this.weapon = weapon;
+            this.unarmed = unarmed;
+        }
     }
 }
