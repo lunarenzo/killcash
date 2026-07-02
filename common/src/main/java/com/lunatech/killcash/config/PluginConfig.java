@@ -148,4 +148,38 @@ public class PluginConfig implements VersionedConfig {
         @Comment("Storage backend to use for player balances. Options: PDC (standard vanilla player NBT files), DATABASE (SQLite/MySQL database). Default: PDC")
         public String backend = "PDC";
     }
+
+    @Comment("Death Message Settings")
+    public DeathMessages deathMessages = new DeathMessages();
+
+    @ConfigSerializable
+    public static class DeathMessages {
+        @Comment("Enable or disable custom death messages")
+        public boolean enabled = true;
+
+        @Comment("When a player kills another player (PVP)")
+        public java.util.List<String> pvpFormats = java.util.List.of(
+            "<red><victim> <gray>was sliced to pieces by <gold><killer> <gray>using <item>",
+            "<gold><killer> <gray>eliminated <red><victim> <gray>via <item> <dark_gray>(Streak: <streak>)"
+        );
+
+        @Comment("When a player kills another player using their bare hands")
+        public java.util.List<String> pvpFistFormats = java.util.List.of(
+            "<red><victim> <gray>was beaten to a pulp by <gold><killer>'s <gray>bare fists!"
+        );
+
+        @Comment("When a player is killed by an entity/mob. Placeholder <killer> holds the entity's display name.")
+        public java.util.List<String> mobFormats = java.util.List.of(
+            "<red><victim> <gray>was slain by <gold><killer> <gray>using <item>",
+            "<red><victim> <gray>was shredded by <gold><killer>"
+        );
+
+        @Comment("Natural/Environmental deaths (e.g. FALL, LAVA, VOID, DROWNING, etc.)")
+        public java.util.Map<String, String> naturalFormats = java.util.Map.of(
+            "FALL", "<red><victim> <gray>discovered that gravity works.",
+            "LAVA", "<red><victim> <gray>tried to swim in lava.",
+            "SUFFOCATION", "<red><victim> <gray>ran out of breathing room.",
+            "DEFAULT", "<red><victim> <gray>died mysteriously."
+        );
+    }
 }

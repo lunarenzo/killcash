@@ -30,6 +30,7 @@ public class ListenerHandler implements Reloadable {
         listeners.add(new com.lunatech.killcash.listener.player.PlayerDeathListener(this.plugin.getKillRewardService()));
         listeners.add(new com.lunatech.killcash.listener.player.PlayerJoinListener(this.plugin.getKillRewardService()));
         listeners.add(new com.lunatech.killcash.listener.player.PlayerQuitListener(this.plugin.getKillRewardService()));
+        listeners.add(new com.lunatech.killcash.listener.player.DeathMessageListener(this.plugin));
 
         // Register listeners here
         for (Listener listener : listeners) {
