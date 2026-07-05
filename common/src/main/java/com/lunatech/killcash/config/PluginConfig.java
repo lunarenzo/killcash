@@ -191,23 +191,23 @@ public class PluginConfig implements VersionedConfig {
 
         @Comment("Custom mappings of Material types to custom weapon type prefixes/icons. " +
                  "Used via the <weapon_type> placeholder in death messages. DEFAULT is the fallback.")
-        public java.util.Map<String, String> weaponTypes = java.util.Map.of(
-            "DIAMOND_SWORD", "⚔ ",
-            "NETHERITE_SWORD", "⚔ ",
-            "IRON_SWORD", "⚔ ",
-            "STONE_SWORD", "⚔ ",
-            "WOODEN_SWORD", "⚔ ",
-            "GOLDEN_SWORD", "⚔ ",
-            "BOW", "🏹 ",
-            "CROSSBOW", "🏹 ",
-            "NETHERITE_AXE", "🪓 ",
-            "DIAMOND_AXE", "🪓 ",
-            "IRON_AXE", "🪓 ",
-            "STONE_AXE", "🪓 ",
-            "WOODEN_AXE", "🪓 ",
-            "GOLDEN_AXE", "🪓 ",
-            "AIR", "👊 ",
-            "DEFAULT", ""
+        public java.util.Map<String, String> weaponTypes = java.util.Map.ofEntries(
+            java.util.Map.entry("DIAMOND_SWORD", "⚔ "),
+            java.util.Map.entry("NETHERITE_SWORD", "⚔ "),
+            java.util.Map.entry("IRON_SWORD", "⚔ "),
+            java.util.Map.entry("STONE_SWORD", "⚔ "),
+            java.util.Map.entry("WOODEN_SWORD", "⚔ "),
+            java.util.Map.entry("GOLDEN_SWORD", "⚔ "),
+            java.util.Map.entry("BOW", "🏹 "),
+            java.util.Map.entry("CROSSBOW", "🏹 "),
+            java.util.Map.entry("NETHERITE_AXE", "🪓 "),
+            java.util.Map.entry("DIAMOND_AXE", "🪓 "),
+            java.util.Map.entry("IRON_AXE", "🪓 "),
+            java.util.Map.entry("STONE_AXE", "🪓 "),
+            java.util.Map.entry("WOODEN_AXE", "🪓 "),
+            java.util.Map.entry("GOLDEN_AXE", "🪓 "),
+            java.util.Map.entry("AIR", "👊 "),
+            java.util.Map.entry("DEFAULT", "")
         );
     }
 
