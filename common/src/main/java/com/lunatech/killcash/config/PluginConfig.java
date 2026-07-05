@@ -159,13 +159,13 @@ public class PluginConfig implements VersionedConfig {
 
         @Comment("When a player kills another player (PVP)")
         public java.util.List<String> pvpFormats = java.util.List.of(
-            "<red><victim> <gray>was sliced to pieces by <gold><killer> <gray>using [<item>]",
-            "<gold><killer> <gray>eliminated <red><victim> <gray>via [<item>] <dark_gray>(Streak: <streak>)"
+            "<red><victim> <gray>was sliced to pieces by <gold><killer> <gray>using <weapon_type>[<item>]",
+            "<gold><killer> <gray>eliminated <red><victim> <gray>via <weapon_type>[<item>] <dark_gray>(Streak: <streak>)"
         );
 
         @Comment("When a player kills another player using their bare hands")
         public java.util.List<String> pvpFistFormats = java.util.List.of(
-            "<red><victim> <gray>was beaten to a pulp by <gold><killer>'s <gray>bare fists!"
+            "<red><victim> <gray>was beaten to a pulp by <gold><killer>'s <weapon_type>bare fists!"
         );
 
         @Comment("Mob-specific death messages. Keys are EntityType names (e.g. CREEPER, ZOMBIE, SKELETON) or DEFAULT. " +
@@ -176,7 +176,7 @@ public class PluginConfig implements VersionedConfig {
                 java.util.List.of("<red><victim> <gray>was blown to smithereens by <gold><killer>!")
             ),
             "DEFAULT", new MobFormatGroup(
-                java.util.List.of("<red><victim> <gray>was slain by <gold><killer> <gray>using [<item>]"),
+                java.util.List.of("<red><victim> <gray>was slain by <gold><killer> <gray>using <weapon_type>[<item>]"),
                 java.util.List.of("<red><victim> <gray>was shredded by <gold><killer>")
             )
         );
@@ -187,6 +187,27 @@ public class PluginConfig implements VersionedConfig {
             "LAVA", "<red><victim> <gray>tried to swim in lava.",
             "SUFFOCATION", "<red><victim> <gray>ran out of breathing room.",
             "DEFAULT", "<red><victim> <gray>died mysteriously."
+        );
+
+        @Comment("Custom mappings of Material types to custom weapon type prefixes/icons. " +
+                 "Used via the <weapon_type> placeholder in death messages. DEFAULT is the fallback.")
+        public java.util.Map<String, String> weaponTypes = java.util.Map.of(
+            "DIAMOND_SWORD", "⚔ ",
+            "NETHERITE_SWORD", "⚔ ",
+            "IRON_SWORD", "⚔ ",
+            "STONE_SWORD", "⚔ ",
+            "WOODEN_SWORD", "⚔ ",
+            "GOLDEN_SWORD", "⚔ ",
+            "BOW", "🏹 ",
+            "CROSSBOW", "🏹 ",
+            "NETHERITE_AXE", "🪓 ",
+            "DIAMOND_AXE", "🪓 ",
+            "IRON_AXE", "🪓 ",
+            "STONE_AXE", "🪓 ",
+            "WOODEN_AXE", "🪓 ",
+            "GOLDEN_AXE", "🪓 ",
+            "AIR", "👊 ",
+            "DEFAULT", ""
         );
     }
 

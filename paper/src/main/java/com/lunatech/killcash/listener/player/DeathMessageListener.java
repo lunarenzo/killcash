@@ -3,7 +3,6 @@ package com.lunatech.killcash.listener.player;
 import com.lunatech.killcash.KillCash;
 import com.lunatech.killcash.config.PluginConfig;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -44,10 +43,10 @@ public final class DeathMessageListener implements Listener {
 
         Component finalMessage;
 
+        EntityDamageEvent lastDamage = victim.getLastDamageCause();
         if (killer != null && !killer.getUniqueId().equals(victim.getUniqueId())) {
-            finalMessage = handlePvpDeath(victim, killer, config.deathMessages);
+            finalMessage = handlePvpDeath(victim, killer, lastDamage, config.deathMessages);
         } else {
-            EntityDamageEvent lastDamage = victim.getLastDamageCause();
             if (lastDamage instanceof EntityDamageByEntityEvent entityDamageEvent) {
                 org.bukkit.entity.Entity damager = entityDamageEvent.getDamager();
                 if (damager instanceof Projectile projectile && projectile.getShooter() instanceof LivingEntity shooter) {
@@ -55,7 +54,7 @@ public final class DeathMessageListener implements Listener {
                 }
 
                 if (damager instanceof LivingEntity mob && !(mob instanceof Player)) {
-                    finalMessage = handleMobDeath(victim, mob, config.deathMessages);
+                    finalMessage = handleMobDeath(victim, mob, lastDamage, config.deathMessages);
                 } else {
                     finalMessage = handleNaturalDeath(victim, lastDamage, config.deathMessages);
                 }
@@ -69,8 +68,8 @@ public final class DeathMessageListener implements Listener {
         }
     }
 
-    private Component handlePvpDeath(Player victim, Player killer, PluginConfig.DeathMessages config) {
-        ItemStack weapon = killer.getInventory().getItemInMainHand();
+    private Component handlePvpDeath(Player victim, Player killer, EntityDamageEvent lastDamage, PluginConfig.DeathMessages config) {
+        ItemStack weapon = getWeaponUsed(killer, lastDamage);
         boolean holdingWeapon = weapon != null && weapon.getType() != Material.AIR;
 
         List<String> templates = holdingWeapon ? config.pvpFormats : config.pvpFistFormats;
@@ -81,25 +80,24 @@ public final class DeathMessageListener implements Listener {
         String template = templates.get(ThreadLocalRandom.current().nextInt(templates.size()));
         int streak = com.lunatech.killcash.pdc.PDCUtil.getInt(killer, com.lunatech.killcash.constant.PDCKeys.STREAK, 0);
 
-        TagResolver baseResolvers = TagResolver.resolver(
+        TagResolver resolvers = TagResolver.resolver(
             Placeholder.component("victim", Component.text(victim.getName())),
             Placeholder.component("killer", Component.text(killer.getName())),
             Placeholder.unparsed("streak", String.valueOf(streak))
         );
 
-        if (holdingWeapon && template.contains("<item>")) {
-            Component itemComponent = buildHoverableItemComponent(weapon);
-            TagResolver pvpResolvers = TagResolver.resolver(
-                baseResolvers,
-                Placeholder.component("item", itemComponent)
-            );
-            return MiniMessage.miniMessage().deserialize(template, pvpResolvers);
+        if (template.contains("<weapon_type>")) {
+            resolvers = TagResolver.resolver(resolvers, Placeholder.parsed("weapon_type", getWeaponType(weapon, config)));
         }
 
-        return MiniMessage.miniMessage().deserialize(template, baseResolvers);
+        if (holdingWeapon && template.contains("<item>")) {
+            resolvers = TagResolver.resolver(resolvers, Placeholder.component("item", buildHoverableItemComponent(weapon)));
+        }
+
+        return MiniMessage.miniMessage().deserialize(template, resolvers);
     }
 
-    private Component handleMobDeath(Player victim, LivingEntity mob, PluginConfig.DeathMessages config) {
+    private Component handleMobDeath(Player victim, LivingEntity mob, EntityDamageEvent lastDamage, PluginConfig.DeathMessages config) {
         String entityType = mob.getType().name();
         PluginConfig.MobFormatGroup formatGroup = config.mobFormats.get(entityType);
         if (formatGroup == null) {
@@ -109,8 +107,7 @@ public final class DeathMessageListener implements Listener {
             return null;
         }
 
-        EntityEquipment equipment = mob.getEquipment();
-        ItemStack weapon = equipment != null ? equipment.getItemInMainHand() : null;
+        ItemStack weapon = getWeaponUsed(mob, lastDamage);
         boolean holdingWeapon = weapon != null && weapon.getType() != Material.AIR;
 
         List<String> templates = holdingWeapon ? formatGroup.weapon : formatGroup.unarmed;
@@ -136,21 +133,20 @@ public final class DeathMessageListener implements Listener {
         String template = templates.get(ThreadLocalRandom.current().nextInt(templates.size()));
         Component mobName = mob.customName() != null ? mob.customName() : Component.translatable(mob.getType().translationKey());
 
-        TagResolver baseResolvers = TagResolver.resolver(
+        TagResolver resolvers = TagResolver.resolver(
             Placeholder.component("victim", Component.text(victim.getName())),
             Placeholder.component("killer", mobName)
         );
 
-        if (holdingWeapon && template.contains("<item>")) {
-            Component itemComponent = buildHoverableItemComponent(weapon);
-            TagResolver resolvers = TagResolver.resolver(
-                baseResolvers,
-                Placeholder.component("item", itemComponent)
-            );
-            return MiniMessage.miniMessage().deserialize(template, resolvers);
+        if (template.contains("<weapon_type>")) {
+            resolvers = TagResolver.resolver(resolvers, Placeholder.parsed("weapon_type", getWeaponType(weapon, config)));
         }
 
-        return MiniMessage.miniMessage().deserialize(template, baseResolvers);
+        if (holdingWeapon && template.contains("<item>")) {
+            resolvers = TagResolver.resolver(resolvers, Placeholder.component("item", buildHoverableItemComponent(weapon)));
+        }
+
+        return MiniMessage.miniMessage().deserialize(template, resolvers);
     }
 
     private Component handleNaturalDeath(Player victim, EntityDamageEvent lastDamage, PluginConfig.DeathMessages config) {
@@ -166,6 +162,44 @@ public final class DeathMessageListener implements Listener {
             template,
             Placeholder.component("victim", Component.text(victim.getName()))
         );
+    }
+
+    private ItemStack getWeaponUsed(LivingEntity killer, EntityDamageEvent lastDamage) {
+        if (lastDamage instanceof EntityDamageByEntityEvent entityDamageEvent) {
+            org.bukkit.entity.Entity damager = entityDamageEvent.getDamager();
+
+            if (damager instanceof org.bukkit.entity.ThrowableProjectile throwableProj) {
+                return throwableProj.getItem();
+            }
+            if (damager instanceof org.bukkit.entity.Trident trident) {
+                return trident.getItem();
+            }
+            if (damager instanceof org.bukkit.entity.Firework firework) {
+                return firework.getItem();
+            }
+            if (damager instanceof Projectile projectile) {
+                ItemStack handItem = killer.getInventory().getItemInMainHand();
+                if (handItem != null && (handItem.getType() == Material.BOW || handItem.getType() == Material.CROSSBOW)) {
+                    return handItem;
+                }
+                if (projectile instanceof org.bukkit.entity.Arrow) {
+                    return new ItemStack(Material.ARROW);
+                }
+                if (projectile instanceof org.bukkit.entity.SpectralArrow) {
+                    return new ItemStack(Material.SPECTRAL_ARROW);
+                }
+            }
+        }
+        return killer.getInventory().getItemInMainHand();
+    }
+
+    private String getWeaponType(ItemStack weapon, PluginConfig.DeathMessages config) {
+        String materialName = (weapon != null && weapon.getType() != Material.AIR) ? weapon.getType().name() : "AIR";
+        String type = config.weaponTypes.get(materialName);
+        if (type == null) {
+            type = config.weaponTypes.getOrDefault("DEFAULT", "");
+        }
+        return type;
     }
 
     private Component buildHoverableItemComponent(ItemStack item) {
