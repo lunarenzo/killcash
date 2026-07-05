@@ -178,7 +178,7 @@ public final class DeathMessageListener implements Listener {
                 return firework.getItem();
             }
             if (damager instanceof Projectile projectile) {
-                ItemStack handItem = killer.getInventory().getItemInMainHand();
+                ItemStack handItem = killer.getEquipment() != null ? killer.getEquipment().getItemInMainHand() : null;
                 if (handItem != null && (handItem.getType() == Material.BOW || handItem.getType() == Material.CROSSBOW)) {
                     return handItem;
                 }
@@ -190,7 +190,7 @@ public final class DeathMessageListener implements Listener {
                 }
             }
         }
-        return killer.getInventory().getItemInMainHand();
+        return killer.getEquipment() != null ? killer.getEquipment().getItemInMainHand() : null;
     }
 
     private String getWeaponType(ItemStack weapon, PluginConfig.DeathMessages config) {
