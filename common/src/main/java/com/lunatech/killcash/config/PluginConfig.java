@@ -149,6 +149,9 @@ public class PluginConfig implements VersionedConfig {
         public String backend = "PDC";
     }
 
+    @Comment("Death Effect Settings")
+    public DeathEffects deathEffects = new DeathEffects();
+
     @Comment("Death Message Settings")
     public DeathMessages deathMessages = new DeathMessages();
 
@@ -225,5 +228,47 @@ public class PluginConfig implements VersionedConfig {
             this.weapon = weapon;
             this.unarmed = unarmed;
         }
+    }
+
+    @ConfigSerializable
+    public static class DeathEffects {
+        @Comment("Lightning effect settings")
+        public LightningSettings lightning = new LightningSettings();
+
+        @Comment("Sound effect settings")
+        public SoundSettings sound = new SoundSettings();
+    }
+
+    @ConfigSerializable
+    public static class LightningSettings {
+        @Comment("Enable client-side lightning strike effect")
+        public boolean enabled = true;
+
+        @Comment("Whom the effect is visible to. Options: KILLER_AND_VICTIM, RADIUS")
+        public String rangeMode = "KILLER_AND_VICTIM";
+
+        @Comment("Radius in blocks to show the effect if rangeMode is RADIUS")
+        public double radius = 32.0;
+    }
+
+    @ConfigSerializable
+    public static class SoundSettings {
+        @Comment("Enable custom sound effect on death")
+        public boolean enabled = true;
+
+        @Comment("The Bukkit Sound enum name to play (e.g. ENTITY_WITHER_SPAWN, ENTITY_LIGHTNING_BOLT_THUNDER)")
+        public String type = "ENTITY_LIGHTNING_BOLT_THUNDER";
+
+        @Comment("Whom the sound is audible to. Options: KILLER_AND_VICTIM, RADIUS")
+        public String rangeMode = "KILLER_AND_VICTIM";
+
+        @Comment("Radius in blocks to play the sound if rangeMode is RADIUS")
+        public double radius = 32.0;
+
+        @Comment("Sound volume")
+        public float volume = 1.0f;
+
+        @Comment("Sound pitch")
+        public float pitch = 1.0f;
     }
 }

@@ -163,4 +163,17 @@ public class PaperMessageService implements MessageService {
             }
         }
     }
+
+    @Override
+    public void playSoundEffect(Player player, org.bukkit.Location location, String soundName, float volume, float pitch) {
+        if (soundName == null || soundName.isEmpty()) return;
+        try {
+            org.bukkit.Sound sound = org.bukkit.Sound.valueOf(soundName.toUpperCase());
+            player.playSound(location, sound, volume, pitch);
+        } catch (IllegalArgumentException e) {
+            try {
+                player.playSound(location, soundName.toLowerCase(), volume, pitch);
+            } catch (Throwable ignored) {}
+        }
+    }
 }

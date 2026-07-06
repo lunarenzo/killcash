@@ -255,9 +255,7 @@ public class DefaultKillRewardService implements KillRewardService, Reloadable {
         final double finalReward = (baseReward * permissionMultiplier * streakMultiplier) + shutdownBonus;
 
         // Visual & Audio feedback
-        if (settings.lightningKillEffect) {
-            messageService.playLightningEffect(killer, victim.getLocation());
-        }
+        handleDeathEffects(killer, victim, settings);
 
         if (killstreakEnabled) {
             double finalStreakMultiplier = streakMultiplier;
@@ -323,5 +321,47 @@ public class DefaultKillRewardService implements KillRewardService, Reloadable {
                 }).execute();
             }
         }).execute();
+    }
+
+    private void handleDeathEffects(Player killer, Player victim, PluginConfig settings) {
+        if (settings == null || settings.deathEffects == null) return;
+
+        org.bukkit.Location deathLoc = victim.getLocation();
+        PluginConfig.DeathEffects effects = settings.deathEffects;
+
+        // 1. Process Lightning Effect
+        if (effects.lightning != null && effects.lightning.enabled) {
+            if ("RADIUS".equalsIgnoreCase(effects.lightning.rangeMode)) {
+                double radiusSq = effects.lightning.radius * effects.lightning.radius;
+                for (Player player : victim.getWorld().getPlayers()) {
+                    if (player.getLocation().distanceSquared(deathLoc) <= radiusSq) {
+                        messageService.playLightningEffect(player, deathLoc);
+                    }
+                }
+            } else {
+                // Default: KILLER_AND_VICTIM
+                messageService.playLightningEffect(killer, deathLoc);
+                messageService.playLightningEffect(victim, deathLoc);
+            }
+        } else if (settings.lightningKillEffect) {
+            // Backward compatibility fallback
+            messageService.playLightningEffect(killer, deathLoc);
+        }
+
+        // 2. Process Sound Effect
+        if (effects.sound != null && effects.sound.enabled && effects.sound.type != null && !effects.sound.type.isEmpty()) {
+            if ("RADIUS".equalsIgnoreCase(effects.sound.rangeMode)) {
+                double radiusSq = effects.sound.radius * effects.sound.radius;
+                for (Player player : victim.getWorld().getPlayers()) {
+                    if (player.getLocation().distanceSquared(deathLoc) <= radiusSq) {
+                        messageService.playSoundEffect(player, deathLoc, effects.sound.type, effects.sound.volume, effects.sound.pitch);
+                    }
+                }
+            } else {
+                // Default: KILLER_AND_VICTIM
+                messageService.playSoundEffect(killer, deathLoc, effects.sound.type, effects.sound.volume, effects.sound.pitch);
+                messageService.playSoundEffect(victim, deathLoc, effects.sound.type, effects.sound.volume, effects.sound.pitch);
+            }
+        }
     }
 }
