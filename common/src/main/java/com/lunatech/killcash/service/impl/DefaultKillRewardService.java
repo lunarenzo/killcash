@@ -255,7 +255,7 @@ public class DefaultKillRewardService implements KillRewardService, Reloadable {
         final double finalReward = (baseReward * permissionMultiplier * streakMultiplier) + shutdownBonus;
 
         // Visual & Audio feedback
-        handleDeathEffects(killer, victim, settings);
+        handleDeathEffects(killer, victim, configHandler.getConfig());
 
         if (killstreakEnabled) {
             double finalStreakMultiplier = streakMultiplier;
@@ -343,7 +343,7 @@ public class DefaultKillRewardService implements KillRewardService, Reloadable {
                 messageService.playLightningEffect(killer, deathLoc);
                 messageService.playLightningEffect(victim, deathLoc);
             }
-        } else if (settings.lightningKillEffect) {
+        } else if (settings.pvpReward != null && settings.pvpReward.lightningKillEffect) {
             // Backward compatibility fallback
             messageService.playLightningEffect(killer, deathLoc);
         }
