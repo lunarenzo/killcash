@@ -343,9 +343,6 @@ public class DefaultKillRewardService implements KillRewardService, Reloadable {
                 messageService.playLightningEffect(killer, deathLoc);
                 messageService.playLightningEffect(victim, deathLoc);
             }
-        } else if (settings.pvpReward != null && settings.pvpReward.lightningKillEffect) {
-            // Backward compatibility fallback
-            messageService.playLightningEffect(killer, deathLoc);
         }
 
         // 2. Process Sound Effect
