@@ -253,7 +253,8 @@ public class PluginConfig implements VersionedConfig {
         @Comment("Enable custom sound effect on death")
         public boolean enabled = true;
 
-        @Comment("The Bukkit Sound enum name to play (e.g. ENTITY_WITHER_SPAWN, ENTITY_LIGHTNING_BOLT_THUNDER)")
+        @Comment("The Bukkit Sound enum name to play (e.g. ENTITY_WITHER_SPAWN, ENTITY_LIGHTNING_BOLT_THUNDER). " +
+                 "Valid sounds: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Sound.html")
         public String type = "ENTITY_LIGHTNING_BOLT_THUNDER";
 
         @Comment("Whom the sound is audible to. Options: KILLER_AND_VICTIM, RADIUS")
