@@ -70,6 +70,15 @@ public interface MessageService {
     void broadcastSound(org.bukkit.Sound sound, float volume, float pitch);
 
     /**
+     * Plays a sound for all online players by its sound enum name or namespace key.
+     *
+     * @param soundName the sound enum name or string namespace key
+     * @param volume the volume of the sound
+     * @param pitch the pitch of the sound
+     */
+    void broadcastSound(String soundName, float volume, float pitch);
+
+    /**
      * Plays a client-side lightning strike effect visible only to the specified player.
      *
      * @param player the player who should see the lightning strike

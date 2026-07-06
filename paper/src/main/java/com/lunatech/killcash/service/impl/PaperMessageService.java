@@ -176,4 +176,12 @@ public class PaperMessageService implements MessageService {
             } catch (Throwable ignored) {}
         }
     }
+
+    @Override
+    public void broadcastSound(String soundName, float volume, float pitch) {
+        if (soundName == null || soundName.isEmpty()) return;
+        for (Player p : org.bukkit.Bukkit.getOnlinePlayers()) {
+            playSoundEffect(p, p.getLocation(), soundName, volume, pitch);
+        }
+    }
 }

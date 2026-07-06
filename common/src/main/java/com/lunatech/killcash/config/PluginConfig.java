@@ -98,6 +98,12 @@ public class PluginConfig implements VersionedConfig {
 
             @Comment("Whether to send personal chat messages notifying players of their active streak")
             public boolean showStreakChat = true;
+
+            @Comment("Sound played to the killer when their streak increments")
+            public StreakSound incrementSound = new StreakSound(true, "ENTITY_PLAYER_LEVELUP", 1.0f, 1.0f);
+
+            @Comment("Sound broadcast to all players when a major streak milestone announcement is triggered")
+            public StreakSound milestoneSound = new StreakSound(true, "ENTITY_LIGHTNING_BOLT_THUNDER", 1.0f, 1.0f);
         }
 
         @Comment("Server-wide announcements for major killstreak milestones.")
@@ -268,5 +274,30 @@ public class PluginConfig implements VersionedConfig {
 
         @Comment("Sound pitch")
         public float pitch = 1.0f;
+    }
+
+    @ConfigSerializable
+    public static class StreakSound {
+        @Comment("Enable this sound effect")
+        public boolean enabled = true;
+
+        @Comment("The Bukkit Sound enum name to play (e.g. ENTITY_PLAYER_LEVELUP, ENTITY_LIGHTNING_BOLT_THUNDER). " +
+                 "Valid sounds: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Sound.html")
+        public String type = "";
+
+        @Comment("Sound volume")
+        public float volume = 1.0f;
+
+        @Comment("Sound pitch")
+        public float pitch = 1.0f;
+
+        public StreakSound() {}
+
+        public StreakSound(boolean enabled, String type, float volume, float pitch) {
+            this.enabled = enabled;
+            this.type = type;
+            this.volume = volume;
+            this.pitch = pitch;
+        }
     }
 }

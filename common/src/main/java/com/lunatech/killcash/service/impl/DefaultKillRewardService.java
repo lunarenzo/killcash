@@ -265,7 +265,9 @@ public class DefaultKillRewardService implements KillRewardService, Reloadable {
                     "multiplier", String.format("%.2f", finalStreakMultiplier)
                 ));
             }
-            messageService.playSound(killer, org.bukkit.Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 1.0f);
+            if (settings.killstreakSettings.incrementSound != null && settings.killstreakSettings.incrementSound.enabled) {
+                messageService.playSoundEffect(killer, killer.getLocation(), settings.killstreakSettings.incrementSound.type, settings.killstreakSettings.incrementSound.volume, settings.killstreakSettings.incrementSound.pitch);
+            }
 
             // Server-wide Announcement Milestones
             if (settings.streakAnnouncements != null && settings.streakAnnouncements.containsKey(String.valueOf(newStreak))) {
@@ -276,7 +278,9 @@ public class DefaultKillRewardService implements KillRewardService, Reloadable {
                         "killer", killer.getName(),
                         "streak", String.valueOf(newStreak)
                     ));
-                    messageService.broadcastSound(org.bukkit.Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 1.0f, 1.0f);
+                    if (settings.killstreakSettings.milestoneSound != null && settings.killstreakSettings.milestoneSound.enabled) {
+                        messageService.broadcastSound(settings.killstreakSettings.milestoneSound.type, settings.killstreakSettings.milestoneSound.volume, settings.killstreakSettings.milestoneSound.pitch);
+                    }
                 }
             }
         }
