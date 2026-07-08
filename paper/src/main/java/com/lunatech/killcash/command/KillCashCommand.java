@@ -209,7 +209,7 @@ final class KillCashCommand extends Command {
                 sender.sendMessage(Translation.as("commands.killcash.stats.player-not-found"));
                 return;
             }
-            ColorParser parser = ColorParser.of(Translation.of("commands.killcash.stats.other-offline"));
+            var parser = ColorParser.of(Translation.of("commands.killcash.stats.other-offline"));
             if (sender instanceof Player) {
                 parser.papi((Player) sender);
             }
@@ -234,7 +234,7 @@ final class KillCashCommand extends Command {
                 sender.sendMessage(Translation.as("commands.killcash.stats.player-not-found"));
                 return;
             }
-            ColorParser parser = ColorParser.of(Translation.of("commands.killcash.balance.other"));
+            var parser = ColorParser.of(Translation.of("commands.killcash.balance.other"));
             if (target.isOnline() && target.getPlayer() != null) {
                 parser.papi(target.getPlayer());
             } else if (sender instanceof Player) {
