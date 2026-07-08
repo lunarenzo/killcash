@@ -196,6 +196,7 @@ final class KillCashCommand extends Command {
                 : "commands.killcash.stats.other-online";
 
             sender.sendMessage(ColorParser.of(Translation.of(node))
+                .papi(onlineTarget)
                 .with("player", target.getName() != null ? target.getName() : "")
                 .with("balance", String.format("%.2f", balance))
                 .with("kills", String.valueOf(kills))
@@ -208,7 +209,11 @@ final class KillCashCommand extends Command {
                 sender.sendMessage(Translation.as("commands.killcash.stats.player-not-found"));
                 return;
             }
-            sender.sendMessage(ColorParser.of(Translation.of("commands.killcash.stats.other-offline"))
+            ColorParser parser = ColorParser.of(Translation.of("commands.killcash.stats.other-offline"));
+            if (sender instanceof Player) {
+                parser.papi((Player) sender);
+            }
+            sender.sendMessage(parser
                 .with("player", name)
                 .with("balance", String.format("%.2f", balance))
                 .build());
@@ -220,6 +225,7 @@ final class KillCashCommand extends Command {
 
         if (sender instanceof Player && ((Player) sender).getUniqueId().equals(target.getUniqueId())) {
             sender.sendMessage(ColorParser.of(Translation.of("commands.killcash.balance.self"))
+                .papi((Player) sender)
                 .with("balance", String.format("%.2f", balance))
                 .build());
         } else {
@@ -228,7 +234,13 @@ final class KillCashCommand extends Command {
                 sender.sendMessage(Translation.as("commands.killcash.stats.player-not-found"));
                 return;
             }
-            sender.sendMessage(ColorParser.of(Translation.of("commands.killcash.balance.other"))
+            ColorParser parser = ColorParser.of(Translation.of("commands.killcash.balance.other"));
+            if (target.isOnline() && target.getPlayer() != null) {
+                parser.papi(target.getPlayer());
+            } else if (sender instanceof Player) {
+                parser.papi((Player) sender);
+            }
+            sender.sendMessage(parser
                 .with("player", name)
                 .with("balance", String.format("%.2f", balance))
                 .build());
