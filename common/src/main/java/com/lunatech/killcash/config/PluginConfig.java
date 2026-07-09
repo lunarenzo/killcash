@@ -63,6 +63,9 @@ public class PluginConfig implements VersionedConfig {
         @Comment("Maximum cash reward per kill")
         public double maxReward = 20.0;
 
+        @Comment("If true, pvp rewards will be rounded to the nearest whole integer (e.g., 15 instead of 14.54)")
+        public boolean wholeNumberOnly = false;
+
         @Comment("Permission-based multipliers. The player receives the highest multiplier they have permission for.")
         public Map<String, Double> permissionMultipliers = Map.of(
             "killcash.multiplier.vip", 1.5,

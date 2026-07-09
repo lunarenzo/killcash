@@ -211,7 +211,11 @@ public class DefaultKillRewardService implements KillRewardService, Reloadable {
         double max = settings.maxReward;
         double baseReward = min;
         if (max > min) {
-            baseReward = min + (ThreadLocalRandom.current().nextDouble() * (max - min));
+            if (settings.wholeNumberOnly) {
+                baseReward = ThreadLocalRandom.current().nextInt((int) min, (int) max + 1);
+            } else {
+                baseReward = min + (ThreadLocalRandom.current().nextDouble() * (max - min));
+            }
         }
 
         // Apply permission multipliers (find the highest applicable multiplier)
@@ -252,7 +256,11 @@ public class DefaultKillRewardService implements KillRewardService, Reloadable {
             shutdownBonus = victimStreak * settings.killstreakSettings.shutdownBonusPerKill;
         }
 
-        final double finalReward = (baseReward * permissionMultiplier * streakMultiplier) + shutdownBonus;
+        double calculatedReward = (baseReward * permissionMultiplier * streakMultiplier) + shutdownBonus;
+        if (settings.wholeNumberOnly) {
+            calculatedReward = Math.round(calculatedReward);
+        }
+        final double finalReward = calculatedReward;
 
         // Visual & Audio feedback
         handleDeathEffects(killer, victim, configHandler.getConfig());
