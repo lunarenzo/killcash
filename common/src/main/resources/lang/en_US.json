@@ -1,4 +1,15 @@
 {
+  "__info": {
+    "header": "KillCash Translation File (en_US)",
+    "description": "Customize all ingame messages, alerts, and formatting here. Supports MiniMessage formatting tags.",
+    "placeholders": {
+      "global": "<plugin_name>",
+      "player_stats": "<player>, <balance>, <kills>, <deaths>, <streak>",
+      "payments": "<amount>, <receiver>, <sender>",
+      "leaderboard": "<pos>, <player>, <balance>",
+      "pvp_events": "<victim>, <killer>, <amount>, <streak>, <multiplier>, <bonus>"
+    }
+  },
   "update-checker": {
     "running-latest": "<white>You are running the latest version of <plugin_name>!",
     "update-found-console": "\n\n<white>An update was found for <plugin_name>!\n    <white>Current version: <red>v<version_current>\n    <white>Latest version: <green><click:open_url:'<download_link>'><hover:show_text:'<green>Open Download Page'>v<version_latest></hover></click>\n",
@@ -10,47 +21,47 @@
       "help": "\n<green>--- KillCash Help ---</green>\n<gold>/killcash stats [player]</gold> - <gray>View player statistics</gray>\n<gold>/killcash balance [player]</gold> - <gray>View player economy balance</gray>\n<gold>/killcash pay <player> <amount></gold> - <gray>Pay another player</gray>\n<gold>/killcash baltop</gold> - <gray>View top 10 player balances</gray>\n<gold>/killcash give <player(s)/all/*> <amount></gold> - <gray>Give currency to player(s)</gray>\n<gold>/killcash take <player(s)/all/*> <amount></gold> - <gray>Take currency from player(s)</gray>\n<gold>/killcash convert <amount></gold> - <gray>Convert KillCash to server economy</gray>\n<gold>/killcash reload [config|lang|all]</gold> - <gray>Reload plugin</gray>\n",
       "only-players": "<red>This command can only be executed by players.</red>",
       "stats": {
-        "self": "\n<green>--- Your PvP Statistics ---</green>\n<gray>Balance:</gray> <gold>$<balance></gold>\n<gray>Kills:</gray> <white><kills></white>\n<gray>Deaths:</gray> <white><deaths></white>\n<gray>Killstreak:</gray> <white><streak></white>\n",
-        "other-online": "\n<green>--- <player>'s PvP Statistics ---</green>\n<gray>Balance:</gray> <gold>$<balance></gold>\n<gray>Kills:</gray> <white><kills></white>\n<gray>Deaths:</gray> <white><deaths></white>\n<gray>Killstreak:</gray> <white><streak></white>\n",
-        "other-offline": "\n<green>--- <player>'s PvP Statistics (Offline) ---</green>\n<gray>Balance:</gray> <gold>$<balance></gold>\n<gray>Kills:</gray> <white>N/A</white>\n<gray>Deaths:</gray> <white>N/A</white>\n<gray>Killstreak:</gray> <white>N/A</white>\n",
+        "self": "\n<white> <color:#ff0000>[ <white><bold>Your PvP Statistics<reset> <color:#ff0000>]\n\n<white> <color:#ff0000>■ <white>Name: %player_name% \n<white> <color:#ff0000>■ <white>Kills: %statistic_player_kills% \n<white> <color:#ff0000>■ <white>Deaths: %statistic_deaths% \n<white> <color:#ff0000>■ <white>K/D Ratio: %kdratio_ratio% \n<white> <color:#ff0000>■ <white>Killstreak: <streak> \n<white> <color:#ff0000>■ <white>Kill Cash: $<balance>\n",
+        "other-online": "\n<white> <color:#ff0000>[ <white><bold>PvP Statistics<reset> <color:#ff0000>]\n\n<white> <color:#ff0000>■ <white>Name: %player_name% \n<white> <color:#ff0000>■ <white>Kills: %statistic_player_kills% \n<white> <color:#ff0000>■ <white>Deaths: %statistic_deaths% \n<white> <color:#ff0000>■ <white>K/D Ratio: %kdratio_ratio% \n<white> <color:#ff0000>■ <white>Killstreak: <streak> \n<white> <color:#ff0000>■ <white>Kill Cash: $<balance>\n",
+        "other-offline": "\n<white> <color:#ff0000>[ <white><bold>PvP Statistics<reset> <color:#ff0000>]\n\n<white> <color:#ff0000>■ <white>Name: <player> &7(Offline) \n<white> <color:#ff0000>■ <white>Kills: N/A \n<white> <color:#ff0000>■ <white>Deaths: N/A \n<white> <color:#ff0000>■ <white>K/D Ratio: N/A \n<white> <color:#ff0000>■ <white>Killstreak: N/A \n<white> <color:#ff0000>■ <white>Kill Cash: N/A\n",
         "player-not-found": "<red>Player <white><player></white> could not be found.</red>"
       },
       "balance": {
-        "self": "<green>Your current balance is <gold>$<balance></gold>.</green>",
-        "other": "<green><player>'s current balance is <gold>$<balance></gold>.</green>"
+        "self": "<white> Current Kill Cash: <color:#ffff00>$<balance>",
+        "other": "<white> <color:#ffff00><player>'s <white>Kill Cash: <color:#ffff00>$<balance>"
       },
       "pay": {
-        "success-sender": "<green>You paid <gold>$<amount></gold> to <white><receiver></white>.</green>",
-        "success-receiver": "<green>You received <gold>$<amount></gold> from <white><sender></white>.</green>",
-        "insufficient-funds": "<red>You do not have enough money to pay <gold>$<amount></gold> (Current balance: <gold>$<balance></gold>).</red>",
+        "success-sender": "<green> You paid <color:#ffff00>$<amount> Kill Cash<green> to <white><receiver>",
+        "success-receiver": "<green> You received <color:#ffff00>$<amount><green> from <white><sender>",
+        "insufficient-funds": "<red> Not enough Kill Cash to pay <color:#ffff00>$<amount><red>. (Current balance: <color:#ffff00>$<balance><red>)",
         "invalid-amount": "<red>The amount must be a positive number.</red>",
         "self-payment": "<red>You cannot pay yourself.</red>",
         "player-offline": "<red>Player <white><player></white> is currently offline.</red>"
       },
       "baltop": {
-        "header": "\n<green>--- KillCash Leaderboard (Top 10) ---</green>\n",
-        "entry": "<gray><pos>.</gray> <white><player></white> - <gold>$<balance></gold>"
+        "header": "\n<white> <color:#ffff00>[ <white><bold>Kill Cash Balance Leaderboard (Top 10)<reset> <color:#ffff00>]\n",
+        "entry": "<white> <color:#ffff00>#<pos>. <white><player> - <color:#ffff00>$<balance>"
       },
       "give": {
-        "success-sender": "<green>Successfully gave <gold>$<amount></gold> to <white><target></white>.</green>",
-        "success-receiver": "<green>You received <gold>$<amount></gold> from an admin.</green>",
-        "invalid-amount": "<red>The amount must be a positive number.</red>",
-        "no-players": "<red>No online players found to give money to.</red>"
+        "success-sender": "<green> Successfully gave <gold>$<amount></gold> to <white><target></white>.</green>",
+        "success-receiver": "<green> You received <gold>$<amount></gold> from an admin.</green>",
+        "invalid-amount": "<red> The amount must be a positive number.</red>",
+        "no-players": "<red> No online players found to give money to.</red>"
       },
       "take": {
-        "success-sender": "<green>Successfully took <gold>$<amount></gold> from <white><target></white>.</green>",
-        "success-receiver": "<red>An admin took <gold>$<amount></gold> from your balance.</red>",
-        "invalid-amount": "<red>The amount must be a positive number.</red>",
-        "no-players": "<red>No online players found to take money from.</red>"
+        "success-sender": "<green> Successfully took <gold>$<amount></gold> from <white><target></white>.</green>",
+        "success-receiver": "<red> An admin took <gold>$<amount></gold> from your balance.</red>",
+        "invalid-amount": "<red> The amount must be a positive number.</red>",
+        "no-players": "<red> No online players found to take money from.</red>"
       },
       "convert": {
         "disabled": "<red>Currency conversion is currently disabled.</red>",
-        "invalid-amount": "<red>The amount must be a positive number.</red>",
-        "min-amount": "<red>You must convert at least <gold><min></gold> KillCash.</red>",
-        "insufficient-funds": "<red>Insufficient KillCash balance! You only have <gold><balance></gold> KillCash.</red>",
-        "vault-error": "<red>Error: Connection to server economy failed. Contact an admin.</red>",
-        "success": "<green><bold>SUCCESS!</bold> Converted <gold><amount> KillCash</gold> into <green>$<payout></green> server money.</green>",
-        "error-processing": "<red>An error occurred while processing the transaction. Please try again.</red>"
+        "invalid-amount": "<red> The amount must be a positive number.</red>",
+        "min-amount": "<red> You must convert at least <gold><min></gold> Kill Cash.</red>",
+        "insufficient-funds": "<red> Insufficient Kill Cash balance! You only have <gold><balance></gold> KillCash.</red>",
+        "vault-error": "<red> Error: Connection to server economy failed. Contact an admin.</red>",
+        "success": "<green><bold> SUCCESS!</bold> Converted <gold><amount> Kill Cash</gold> into <green>$<payout></green> server money.</green>",
+        "error-processing": "<red> An error occurred while processing the transaction. Please try again.</red>"
       },
       "reload": {
         "success": "<green>Successfully reloaded KillCash configuration and translations!</green>",
@@ -64,13 +75,13 @@
     }
   },
   "pvp": {
-    "reward-received": "<green>You earned <gold>$<amount></gold> for killing <white><victim></white>!",
-    "anti-abuse-cooldown": "<red>You killed <white><victim></white> too recently. No reward issued.",
+    "reward-received": "<white> <color:#FFFF00>+$<amount> Kill Cash <white>for killing <victim></white>",
+    "anti-abuse-cooldown": "<red> You killed <white><victim></white> too recently. No reward issued.",
     "anti-abuse-same-ip": "<red>You cannot earn rewards for killing players on the same network.",
-    "anti-abuse-playtime": "<red>Victim <white><victim></white> does not have enough playtime. No reward issued.",
-    "streak-active": "<green>You are currently on a <gold><streak></gold> killstreak!",
-    "shutdown": "<red><bold>SHUTDOWN!</bold></red> <yellow><killer> ended <gold><victim>'s</gold> <white><streak>-kill</white> streak and earned a <green>+$<bonus></green> Bonus!</yellow>",
+    "anti-abuse-playtime": "<red> Player <white><victim></white> does not have enough playtime. No reward issued.",
+    "streak-active": "<green> You are currently on a <gold><streak></gold> killstreak!",
+    "shutdown": "<white> [ <color:#ff0000><bold>SHUTDOWN!</bold><white> ] <color:#ff0000><killer> <white>ended <victim>'s <color:#ff0000><streak>-kill <white>streak",
     "action-bar": "<gold>Active Streak: <yellow><streak></yellow> <dark_gray>(<green><multiplier>x Cash</green>)</dark_gray></gold>",
-    "streak-decayed": "<red>Your killstreak has decayed to <white><streak></white> due to inactivity!</red>"
+    "streak-decayed": "<white> Killstreak <color:#ff0000>-1 <white>due to inactivity!"
   }
 }
