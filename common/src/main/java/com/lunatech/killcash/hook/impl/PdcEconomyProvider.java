@@ -94,7 +94,7 @@ public class PdcEconomyProvider implements EconomyProvider, Listener {
         if (player != null && player.isOnline() && player.getPlayer() != null) {
             Player onlinePlayer = player.getPlayer();
             double current = getBalance(onlinePlayer);
-            PDCUtil.setDouble(onlinePlayer, PDCKeys.BALANCE, current + amount);
+            PDCUtil.setDouble(onlinePlayer, PDCKeys.BALANCE, Math.round((current + amount) * 100.0) / 100.0);
             return true;
         }
         return false;
@@ -106,8 +106,8 @@ public class PdcEconomyProvider implements EconomyProvider, Listener {
         if (player != null && player.isOnline() && player.getPlayer() != null) {
             Player onlinePlayer = player.getPlayer();
             double current = getBalance(onlinePlayer);
-            if (current < amount) return false;
-            PDCUtil.setDouble(onlinePlayer, PDCKeys.BALANCE, current - amount);
+            if (current + 1E-5 < amount) return false;
+            PDCUtil.setDouble(onlinePlayer, PDCKeys.BALANCE, Math.round((current - amount) * 100.0) / 100.0);
             return true;
         }
         return false;

@@ -230,7 +230,7 @@ public class CachedSqlEconomyProvider implements EconomyProvider, Listener {
         UUID uuid = player.getUniqueId();
 
         double current = getBalance(player);
-        tokenCache.put(uuid, current + amount);
+        tokenCache.put(uuid, Math.round((current + amount) * 100.0) / 100.0);
         dirtyKeys.add(uuid);
         return true;
     }
@@ -241,9 +241,9 @@ public class CachedSqlEconomyProvider implements EconomyProvider, Listener {
         UUID uuid = player.getUniqueId();
 
         double current = getBalance(player);
-        if (current < amount) return false;
+        if (current + 1E-5 < amount) return false;
 
-        tokenCache.put(uuid, current - amount);
+        tokenCache.put(uuid, Math.round((current - amount) * 100.0) / 100.0);
         dirtyKeys.add(uuid);
         return true;
     }

@@ -350,7 +350,7 @@ final class KillCashCommand extends Command {
                 }
 
                 double senderBalance = plugin.getHookManager().getEconomyProvider().getBalance(player);
-                if (senderBalance < amount) {
+                if (senderBalance + 1E-5 < amount) {
                     player.sendMessage(ColorParser.of(Translation.of("commands.killcash.pay.insufficient-funds"))
                         .with("amount", String.format("%.2f", amount))
                         .with("balance", String.format("%.2f", senderBalance))
