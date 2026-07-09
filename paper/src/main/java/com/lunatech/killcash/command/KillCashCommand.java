@@ -206,7 +206,9 @@ final class KillCashCommand extends Command {
         } else {
             String name = target.getName();
             if (name == null || (!target.hasPlayedBefore() && plugin.getServer().getPlayer(name) == null)) {
-                sender.sendMessage(Translation.as("commands.killcash.stats.player-not-found"));
+                sender.sendMessage(ColorParser.of(Translation.of("commands.killcash.stats.player-not-found"))
+                    .with("player", name != null ? name : "Unknown")
+                    .build());
                 return;
             }
             var parser = ColorParser.of(Translation.of("commands.killcash.stats.other-offline"));
@@ -231,7 +233,9 @@ final class KillCashCommand extends Command {
         } else {
             String name = target.getName();
             if (name == null || (!target.hasPlayedBefore() && plugin.getServer().getPlayer(name) == null)) {
-                sender.sendMessage(Translation.as("commands.killcash.stats.player-not-found"));
+                sender.sendMessage(ColorParser.of(Translation.of("commands.killcash.stats.player-not-found"))
+                    .with("player", name != null ? name : "Unknown")
+                    .build());
                 return;
             }
             var parser = ColorParser.of(Translation.of("commands.killcash.balance.other"));
