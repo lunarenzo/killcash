@@ -42,6 +42,12 @@ public class ConfigHandler implements Reloadable {
 
     @Override
     public void onLoad(AbstractKillCash plugin) {
+        new com.lunatech.killcash.config.migration.ConfigMigrator(configDir, logger)
+            .addRule("config.yml", "pvp-reward", "pvp-rewards.yml", false)
+            .addRule("config.yml", "death-effects", "death-effects.yml", false)
+            .addRule("config.yml", "death-messages", "death-messages.yml", false)
+            .migrate();
+
         cfg = new ConfigLoader()
             .withLogger(logger)
             .withDirectory()
