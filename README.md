@@ -11,7 +11,7 @@
   <img alt="Platforms" src="https://img.shields.io/badge/PLATFORM-PAPER%20%7C%20FOLIA-1F8ACB?style=for-the-badge&labelColor=141417">
   <img alt="CI/CD Status" src="https://img.shields.io/github/actions/workflow/status/lunarenzo/killcash/ci.yml?style=for-the-badge&labelColor=141417">
   <a href="LICENSE">
-    <img alt="License" src="https://img.shields.io/github/license/lunarenzo/killcash?style=for-the-badge&color=blue&labelColor=141417">
+    <img alt="License" src="https://img.shields.io/badge/LICENSE-SOURCE--AVAILABLE-9C27B0?style=for-the-badge&labelColor=141417">
   </a>
 </div>
 
