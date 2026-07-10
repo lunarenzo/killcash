@@ -4,6 +4,16 @@ KillCash is a high-performance Paper/Spigot Minecraft plugin designed to reward 
 
 ---
 
+## ⚙️ Compatibility & Requirements
+
+* **Supported Platforms:** 
+  * **Paper**, **Purpur**, and **Folia** (fully supported with multi-threaded compatibility).
+  * *Note: Spigot is not natively supported due to the plugin's direct dependency on Paper's native Adventure Component API (MiniMessage) for formatting and performance.*
+* **Supported Game Versions:** Minecraft **1.20 - 1.21.x+** (compiled against Paper API `1.21.11`).
+* **Java Version:** **Java 21** or higher (compiled using JDK 21 toolchain).
+
+---
+
 ## 🌟 Key Features
 
 * **PVP Cash Rewards:** Configurable minimum and maximum payout ranges. Includes a `wholeNumberOnly` option to keep base rewards and calculated multipliers rounded mathematically.
@@ -32,16 +42,22 @@ KillCash is a high-performance Paper/Spigot Minecraft plugin designed to reward 
 
 ## 💻 Commands & Permissions
 
-| Command | Description | Default Permission |
-| :--- | :--- | :--- |
-| `/killcash balance [player]` | View current cash balance. | `killcash.balance` |
-| `/killcash stats [player]` | View stats (kills, deaths, balance, streak). | `killcash.stats` |
-| `/killcash pay <player> <amount>` | Send cash to another player. | `killcash.pay` |
-| `/killcash convert <amount>` | Convert tokens to main server currency. | `killcash.convert` |
-| `/killcash help` | Show help menu. | `killcash.use` |
-| `/killcash reload [config/lang/all]` | Reload configurations or language resources on-the-fly. | `killcash.reload` |
-| `/killcash give <player> <amount>` | Add cash to a player's balance. | `killcash.admin` |
-| `/killcash take <player> <amount>` | Withdraw cash from a player's balance. | `killcash.admin` |
+All commands support the `/killcash` base command, along with the `/kc` shorthand alias.
+
+| Command | Aliases | Description | Permission Node | Default |
+| :--- | :--- | :--- | :--- | :--- |
+| `/killcash help` | | Shows help menu and commands list. | `killcash.command` | Operators |
+| `/killcash balance [player]` | `/kc bal` | View current cash balance. | `killcash.command.balance` | Everyone |
+| `/killcash stats [player]` | | View stats (kills, deaths, balance, streak). | `killcash.command.stats` | Everyone |
+| `/killcash pay <player> <amount>` | | Send cash directly to another player. | `killcash.command.pay` | Everyone |
+| `/killcash convert <amount>` | `/kc exchange` | Convert tokens to main server currency. | `killcash.command.convert` | Everyone |
+| `/killcash baltop` | `/kc balancetop` | View top 10 players with the highest balance. | `killcash.command.baltop` | Everyone |
+| `/killcash give <player/*> <amount>` | | Add cash to a player's balance. | `killcash.command.give` | Operators |
+| `/killcash take <player/*> <amount>` | | Deduct cash from a player's balance. | `killcash.command.take` | Operators |
+| `/killcash reload [config/lang/all]` | | Reload configurations or language resources on-the-fly. | `killcash.command.reload` | Operators |
+| `/killcash reloadconfig` | | Reload configuration files only. | `killcash.command.reload` | Operators |
+| `/killcash reloadlang` | | Reload language translations only. | `killcash.command.reload` | Operators |
+| `/killcash reloadall` | | Reload all files and systems. | `killcash.command.reload` | Operators |
 
 ---
 
