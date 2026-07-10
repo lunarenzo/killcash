@@ -19,6 +19,9 @@ public class ConfigHandler implements Reloadable {
 
     private PluginConfig cfg;
     private DatabaseConfig databaseCfg;
+    private PvpRewardsConfig pvpRewardsCfg;
+    private DeathEffectsConfig deathEffectsCfg;
+    private DeathMessagesConfig deathMessagesCfg;
 
     /**
      * Instantiates a new Config handler.
@@ -56,6 +59,35 @@ public class ConfigHandler implements Reloadable {
                     .registerExact(StringObjectMapSerializer.TYPE_TOKEN, StringObjectMapSerializer.INSTANCE);
             })
             .build(DatabaseConfig.class);
+
+        pvpRewardsCfg = new ConfigLoader()
+            .withLogger(logger)
+            .withDirectory()
+            .withPath(configDir.resolve("pvp-rewards.yml"))
+            .withHeader("")
+            .withSerializer(b -> {
+                b.registerExact(StringListSerializer.TYPE_TOKEN, StringListSerializer.INSTANCE)
+                    .registerExact(StringObjectMapSerializer.TYPE_TOKEN, StringObjectMapSerializer.INSTANCE);
+            })
+            .build(PvpRewardsConfig.class);
+
+        deathEffectsCfg = new ConfigLoader()
+            .withLogger(logger)
+            .withDirectory()
+            .withPath(configDir.resolve("death-effects.yml"))
+            .withHeader("")
+            .build(DeathEffectsConfig.class);
+
+        deathMessagesCfg = new ConfigLoader()
+            .withLogger(logger)
+            .withDirectory()
+            .withPath(configDir.resolve("death-messages.yml"))
+            .withHeader("")
+            .withSerializer(b -> {
+                b.registerExact(StringListSerializer.TYPE_TOKEN, StringListSerializer.INSTANCE)
+                    .registerExact(StringObjectMapSerializer.TYPE_TOKEN, StringObjectMapSerializer.INSTANCE);
+            })
+            .build(DeathMessagesConfig.class);
     }
 
     /**
@@ -74,5 +106,32 @@ public class ConfigHandler implements Reloadable {
      */
     public DatabaseConfig getDatabaseConfig() {
         return databaseCfg;
+    }
+
+    /**
+     * Gets pvp rewards config object.
+     *
+     * @return the config object
+     */
+    public PvpRewardsConfig getPvpRewardsConfig() {
+        return pvpRewardsCfg;
+    }
+
+    /**
+     * Gets death effects config object.
+     *
+     * @return the config object
+     */
+    public DeathEffectsConfig getDeathEffectsConfig() {
+        return deathEffectsCfg;
+    }
+
+    /**
+     * Gets death messages config object.
+     *
+     * @return the config object
+     */
+    public DeathMessagesConfig getDeathMessagesConfig() {
+        return deathMessagesCfg;
     }
 }

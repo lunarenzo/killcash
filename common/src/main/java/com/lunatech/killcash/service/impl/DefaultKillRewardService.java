@@ -4,6 +4,8 @@ import com.lunatech.killcash.Reloadable;
 import com.lunatech.killcash.cache.KillCooldownCache;
 import com.lunatech.killcash.config.ConfigHandler;
 import com.lunatech.killcash.config.PluginConfig;
+import com.lunatech.killcash.config.PvpRewardsConfig;
+import com.lunatech.killcash.config.DeathEffectsConfig;
 import com.lunatech.killcash.constant.PDCKeys;
 import com.lunatech.killcash.hook.EconomyProvider;
 import com.lunatech.killcash.pdc.PDCUtil;
@@ -65,7 +67,7 @@ public class DefaultKillRewardService implements KillRewardService, Reloadable {
 
     @Override
     public void handleJoin(Player player) {
-        PluginConfig.PvpReward settings = configHandler.getConfig().pvpReward;
+        PvpRewardsConfig settings = configHandler.getPvpRewardsConfig();
         if (settings == null || settings.killstreakSettings == null || !settings.killstreakSettings.enabled) {
             return;
         }
@@ -93,7 +95,7 @@ public class DefaultKillRewardService implements KillRewardService, Reloadable {
 
     @Override
     public void handleQuit(Player player) {
-        PluginConfig.PvpReward settings = configHandler.getConfig().pvpReward;
+        PvpRewardsConfig settings = configHandler.getPvpRewardsConfig();
         if (settings == null || settings.killstreakSettings == null || !settings.killstreakSettings.enabled) {
             return;
         }
@@ -106,7 +108,7 @@ public class DefaultKillRewardService implements KillRewardService, Reloadable {
         long now = System.currentTimeMillis();
         logoutTimes.entrySet().removeIf(entry -> (now - entry.getValue()) > 5 * 60 * 1000);
 
-        PluginConfig.PvpReward settings = configHandler.getConfig().pvpReward;
+        PvpRewardsConfig settings = configHandler.getPvpRewardsConfig();
         if (settings == null || settings.killstreakSettings == null || !settings.killstreakSettings.enabled) return;
         long decayTime = settings.killstreakSettings.decayTime;
         if (decayTime <= 0) return;
@@ -152,7 +154,7 @@ public class DefaultKillRewardService implements KillRewardService, Reloadable {
 
     @Override
     public void processKill(Player killer, Player victim) {
-        PluginConfig.PvpReward settings = configHandler.getConfig().pvpReward;
+        PvpRewardsConfig settings = configHandler.getPvpRewardsConfig();
         if (!settings.enabled) {
             return;
         }
@@ -263,7 +265,7 @@ public class DefaultKillRewardService implements KillRewardService, Reloadable {
         final double finalReward = calculatedReward;
 
         // Visual & Audio feedback
-        handleDeathEffects(killer, victim, configHandler.getConfig());
+        handleDeathEffects(killer, victim, configHandler.getDeathEffectsConfig());
 
         if (killstreakEnabled) {
             double finalStreakMultiplier = streakMultiplier;
@@ -335,11 +337,10 @@ public class DefaultKillRewardService implements KillRewardService, Reloadable {
         }).execute();
     }
 
-    private void handleDeathEffects(Player killer, Player victim, PluginConfig settings) {
-        if (settings == null || settings.deathEffects == null) return;
+    private void handleDeathEffects(Player killer, Player victim, DeathEffectsConfig effects) {
+        if (effects == null) return;
 
         org.bukkit.Location deathLoc = victim.getLocation();
-        PluginConfig.DeathEffects effects = settings.deathEffects;
 
         // 1. Process Lightning Effect
         if (effects.lightning != null && effects.lightning.enabled) {

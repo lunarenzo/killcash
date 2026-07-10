@@ -2,6 +2,7 @@ package com.lunatech.killcash.listener.player;
 
 import com.lunatech.killcash.KillCash;
 import com.lunatech.killcash.config.PluginConfig;
+import com.lunatech.killcash.config.DeathMessagesConfig;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
@@ -33,8 +34,8 @@ public final class DeathMessageListener implements Listener {
 
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
-        PluginConfig config = plugin.getConfigHandler().getConfig();
-        if (config == null || config.deathMessages == null || !config.deathMessages.enabled) {
+        DeathMessagesConfig config = plugin.getConfigHandler().getDeathMessagesConfig();
+        if (config == null || !config.enabled) {
             return;
         }
 
@@ -45,7 +46,7 @@ public final class DeathMessageListener implements Listener {
 
         EntityDamageEvent lastDamage = victim.getLastDamageCause();
         if (killer != null && !killer.getUniqueId().equals(victim.getUniqueId())) {
-            finalMessage = handlePvpDeath(victim, killer, lastDamage, config.deathMessages);
+            finalMessage = handlePvpDeath(victim, killer, lastDamage, config);
         } else {
             if (lastDamage instanceof EntityDamageByEntityEvent entityDamageEvent) {
                 org.bukkit.entity.Entity damager = entityDamageEvent.getDamager();
@@ -54,12 +55,12 @@ public final class DeathMessageListener implements Listener {
                 }
 
                 if (damager instanceof LivingEntity mob && !(mob instanceof Player)) {
-                    finalMessage = handleMobDeath(victim, mob, lastDamage, config.deathMessages);
+                    finalMessage = handleMobDeath(victim, mob, lastDamage, config);
                 } else {
-                    finalMessage = handleNaturalDeath(victim, lastDamage, config.deathMessages);
+                    finalMessage = handleNaturalDeath(victim, lastDamage, config);
                 }
             } else {
-                finalMessage = handleNaturalDeath(victim, lastDamage, config.deathMessages);
+                finalMessage = handleNaturalDeath(victim, lastDamage, config);
             }
         }
 
@@ -68,7 +69,7 @@ public final class DeathMessageListener implements Listener {
         }
     }
 
-    private Component handlePvpDeath(Player victim, Player killer, EntityDamageEvent lastDamage, PluginConfig.DeathMessages config) {
+    private Component handlePvpDeath(Player victim, Player killer, EntityDamageEvent lastDamage, DeathMessagesConfig config) {
         ItemStack weapon = getWeaponUsed(killer, lastDamage);
         boolean holdingWeapon = weapon != null && weapon.getType() != Material.AIR;
 
@@ -97,9 +98,9 @@ public final class DeathMessageListener implements Listener {
         return MiniMessage.miniMessage().deserialize(template, resolvers);
     }
 
-    private Component handleMobDeath(Player victim, LivingEntity mob, EntityDamageEvent lastDamage, PluginConfig.DeathMessages config) {
+    private Component handleMobDeath(Player victim, LivingEntity mob, EntityDamageEvent lastDamage, DeathMessagesConfig config) {
         String entityType = mob.getType().name();
-        PluginConfig.MobFormatGroup formatGroup = config.mobFormats.get(entityType);
+        DeathMessagesConfig.MobFormatGroup formatGroup = config.mobFormats.get(entityType);
         if (formatGroup == null) {
             formatGroup = config.mobFormats.get("DEFAULT");
         }
@@ -117,7 +118,7 @@ public final class DeathMessageListener implements Listener {
         }
         // Fallback to DEFAULT format group if still empty
         if (templates == null || templates.isEmpty()) {
-            PluginConfig.MobFormatGroup defaultGroup = config.mobFormats.get("DEFAULT");
+            DeathMessagesConfig.MobFormatGroup defaultGroup = config.mobFormats.get("DEFAULT");
             if (defaultGroup != null) {
                 templates = holdingWeapon ? defaultGroup.weapon : defaultGroup.unarmed;
                 if (templates == null || templates.isEmpty()) {
@@ -149,7 +150,7 @@ public final class DeathMessageListener implements Listener {
         return MiniMessage.miniMessage().deserialize(template, resolvers);
     }
 
-    private Component handleNaturalDeath(Player victim, EntityDamageEvent lastDamage, PluginConfig.DeathMessages config) {
+    private Component handleNaturalDeath(Player victim, EntityDamageEvent lastDamage, DeathMessagesConfig config) {
         EntityDamageEvent.DamageCause cause = (lastDamage != null) ? lastDamage.getCause() : EntityDamageEvent.DamageCause.CUSTOM;
         String causeName = cause.name();
 
@@ -193,7 +194,7 @@ public final class DeathMessageListener implements Listener {
         return killer.getEquipment() != null ? killer.getEquipment().getItemInMainHand() : null;
     }
 
-    private String getWeaponType(ItemStack weapon, PluginConfig.DeathMessages config) {
+    private String getWeaponType(ItemStack weapon, DeathMessagesConfig config) {
         String materialName = (weapon != null && weapon.getType() != Material.AIR) ? weapon.getType().name() : "AIR";
         String type = config.weaponTypes.get(materialName);
         if (type == null) {

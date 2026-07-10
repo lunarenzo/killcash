@@ -11,7 +11,7 @@ import java.util.Map;
 
 @ConfigSerializable
 public class PluginConfig implements VersionedConfig {
-    @Comment("Do not change this value!")
+    @Comment("Do not change this value! Internal configuration version tracker.")
     public int configVersion = 1;
 
     @Override
@@ -31,276 +31,67 @@ public class PluginConfig implements VersionedConfig {
     public void validate() throws ConfigValidationException {
     }
 
-    @Comment("Update Checker Settings")
+    @Comment("""
+        UPDATE CHECKER SETTINGS
+        =======================
+        Control whether the plugin checks for updates and alerts administrators.
+        Checks are run asynchronously on startup and join.
+        """)
     public UpdateChecker updateChecker = new UpdateChecker();
 
     @ConfigSerializable
     public static class UpdateChecker {
-        @Comment("Should the plugin check for plugin updates on startup?")
+        @Comment("Should the plugin check for newer versions on GitHub?")
         public boolean enabled = true;
 
-        @Comment("Send update notifications to the console?")
+        @Comment("Print update notifications to the server console log?")
         public boolean console = true;
 
-        @Comment("Send update notifications to opped players on join?")
+        @Comment("Notify operators/admin players when they join the server?")
         public boolean op = true;
     }
 
-    @Comment("Language, specify the language file to use, for example `en_US` which will load `/lang/en_US.json`")
+    @Comment("""
+        LANGUAGE SETTING
+        ================
+        Choose the locale/language file used for messages and commands.
+        Example: 'en_US' loads resources/lang/en_US.json or plugins/KillCash/lang/en_US.json.
+        """)
     public String language = "en_US";
 
-    @Comment("PvP Reward Settings")
-    public PvpReward pvpReward = new PvpReward();
-
-    @ConfigSerializable
-    public static class PvpReward {
-        @Comment("Enable or disable PvP cash rewards")
-        public boolean enabled = true;
-
-        @Comment("Minimum cash reward per kill")
-        public double minReward = 10.0;
-
-        @Comment("Maximum cash reward per kill")
-        public double maxReward = 20.0;
-
-        @Comment("If true, pvp rewards will be rounded to the nearest whole integer (e.g., 15 instead of 14.54)")
-        public boolean wholeNumberOnly = false;
-
-        @Comment("Permission-based multipliers. The player receives the highest multiplier they have permission for.")
-        public Map<String, Double> permissionMultipliers = Map.of(
-            "killcash.multiplier.vip", 1.5,
-            "killcash.multiplier.mvp", 2.0
-        );
-
-        @Comment("Streak-based multipliers. Compounding multiplier applied when the player reaches a specific killstreak.")
-        public Map<String, Double> streakMultipliers = Map.of(
-            "3", 1.1,
-            "5", 1.25,
-            "10", 1.5
-        );
-
-        @Comment("Killstreak settings")
-        public KillstreakSettings killstreakSettings = new KillstreakSettings();
-
-        @ConfigSerializable
-        public static class KillstreakSettings {
-            @Comment("Enable or disable the overall killstreak system")
-            public boolean enabled = true;
-
-            @Comment("If true, streaks apply to the next bracket up (e.g., streak of 4 gets 3's multiplier)")
-            public boolean useRangeSystem = true;
-
-            @Comment("Time in seconds before a streak starts resetting due to inactivity")
-            public long decayTime = 60;
-
-            @Comment("Cash rewarded per streak level to the person who ends the streak")
-            public double shutdownBonusPerKill = 25.0;
-
-            @Comment("Whether to send action bar messages showing active streak and multiplier")
-            public boolean showActionBar = true;
-
-            @Comment("Whether to send personal chat messages notifying players of their active streak")
-            public boolean showStreakChat = true;
-
-            @Comment("Sound played to the killer when their streak increments")
-            public StreakSound incrementSound = new StreakSound(true, "ENTITY_PLAYER_LEVELUP", 1.0f, 1.0f);
-
-            @Comment("Sound broadcast to all players when a major streak milestone announcement is triggered")
-            public StreakSound milestoneSound = new StreakSound(true, "ENTITY_LIGHTNING_BOLT_THUNDER", 1.0f, 1.0f);
-        }
-
-        @Comment("Server-wide announcements for major killstreak milestones.")
-        public Map<String, String> streakAnnouncements = Map.of(
-            "5", "<red><bold>[KILLSTREAK]</bold></red> <yellow><player> is on a <gold>5 Kill Streak</gold>!</yellow>",
-            "10", "<dark_red><bold>[RAMPAGE]</bold></dark_red> <yellow><player> is unstoppable with a <red>10 Kill Streak</red>!</yellow>"
-        );
-
-        @Comment("Anti-Abuse Settings")
-        public AntiAbuse antiAbuse = new AntiAbuse();
-
-        @ConfigSerializable
-        public static class AntiAbuse {
-            @Comment("Prevent rewards if the killer and victim share the same IP address")
-            public boolean ipCheck = true;
-
-            @Comment("Cooldown (in seconds) between rewards for killing the same player")
-            public long killCooldown = 600; // 10 minutes
-
-            @Comment("Minimum playtime (in seconds) the victim must have to be eligible for rewards")
-            public long minPlaytime = 300; // 5 minutes
-        }
-    }
-
-    @Comment("Currency Conversion Settings")
+    @Comment("""
+        CURRENCY CONVERSION SETTINGS
+        ============================
+        Configure token exchange settings from KillCash tokens to server economy (Vault).
+        Allows players to run '/killcash convert <amount>' to exchange tokens for server cash.
+        """)
     public ConversionSettings conversionSettings = new ConversionSettings();
 
     @ConfigSerializable
     public static class ConversionSettings {
-        @Comment("Enable or disable currency conversion from KillCash to main server economy")
+        @Comment("Allow players to convert their KillCash balance into main server money.")
         public boolean enabled = true;
 
-        @Comment("Exchange rate: how many server economy dollars you get per 1 KillCash token")
+        @Comment("Exchange rate: how many server economy dollars (Vault) are awarded per 1.0 KillCash token.")
         public double exchangeRate = 100.0;
 
-        @Comment("Minimum amount of KillCash a player can convert at once")
+        @Comment("Minimum amount of KillCash tokens required to perform a single conversion.")
         public double minimumConversion = 1.0;
     }
 
-    @Comment("Storage Settings")
+    @Comment("""
+        STORAGE SETTINGS
+        ================
+        Choose where player balances and transaction data are stored.
+        Available Options:
+        - PDC: Store inside standard Vanilla player NBT files (PersistentDataContainer). Simple, zero setup, ideal for single servers.
+        - DATABASE: Store in SQL Cache database (SQLite/MySQL/MariaDB/PostgreSQL/H2). Supports cross-server sync.
+        """)
     public StorageSettings storage = new StorageSettings();
 
     @ConfigSerializable
     public static class StorageSettings {
-        @Comment("Storage backend to use for player balances. Options: PDC (standard vanilla player NBT files), DATABASE (SQLite/MySQL database). Default: PDC")
+        @Comment("The storage backend to use for balances. Options: PDC, DATABASE.")
         public String backend = "PDC";
-    }
-
-    @Comment("Death Effect Settings")
-    public DeathEffects deathEffects = new DeathEffects();
-
-    @Comment("Death Message Settings")
-    public DeathMessages deathMessages = new DeathMessages();
-
-    @ConfigSerializable
-    public static class DeathMessages {
-        @Comment("Enable or disable custom death messages")
-        public boolean enabled = true;
-
-        @Comment("When a player kills another player (PVP)")
-        public java.util.List<String> pvpFormats = java.util.List.of(
-            "<red><victim> <gray>was sliced to pieces by <gold><killer> <gray>using <weapon_type>[<item>]",
-            "<gold><killer> <gray>eliminated <red><victim> <gray>via <weapon_type>[<item>] <dark_gray>(Streak: <streak>)"
-        );
-
-        @Comment("When a player kills another player using their bare hands")
-        public java.util.List<String> pvpFistFormats = java.util.List.of(
-            "<red><victim> <gray>was beaten to a pulp by <gold><killer>'s <weapon_type>bare fists!"
-        );
-
-        @Comment("Mob-specific death messages. Keys are EntityType names (e.g. CREEPER, ZOMBIE, SKELETON) or DEFAULT. " +
-                 "Formats are divided into 'weapon' (used when the mob holds an item) and 'unarmed' (used when the mob is unarmed).")
-        public java.util.Map<String, MobFormatGroup> mobFormats = java.util.Map.of(
-            "CREEPER", new MobFormatGroup(
-                java.util.List.of(),
-                java.util.List.of("<red><victim> <gray>was blown to smithereens by <gold><killer>!")
-            ),
-            "DEFAULT", new MobFormatGroup(
-                java.util.List.of("<red><victim> <gray>was slain by <gold><killer> <gray>using <weapon_type>[<item>]"),
-                java.util.List.of("<red><victim> <gray>was shredded by <gold><killer>")
-            )
-        );
-
-        @Comment("Natural/Environmental deaths (e.g. FALL, LAVA, VOID, DROWNING, etc.)")
-        public java.util.Map<String, String> naturalFormats = java.util.Map.of(
-            "FALL", "<red><victim> <gray>discovered that gravity works.",
-            "LAVA", "<red><victim> <gray>tried to swim in lava.",
-            "SUFFOCATION", "<red><victim> <gray>ran out of breathing room.",
-            "DEFAULT", "<red><victim> <gray>died mysteriously."
-        );
-
-        @Comment("Custom mappings of Material types to custom weapon type prefixes/icons. " +
-                 "Used via the <weapon_type> placeholder in death messages. DEFAULT is the fallback.")
-        public java.util.Map<String, String> weaponTypes = java.util.Map.ofEntries(
-            java.util.Map.entry("DIAMOND_SWORD", "⚔ "),
-            java.util.Map.entry("NETHERITE_SWORD", "⚔ "),
-            java.util.Map.entry("IRON_SWORD", "⚔ "),
-            java.util.Map.entry("STONE_SWORD", "⚔ "),
-            java.util.Map.entry("WOODEN_SWORD", "⚔ "),
-            java.util.Map.entry("GOLDEN_SWORD", "⚔ "),
-            java.util.Map.entry("BOW", "🏹 "),
-            java.util.Map.entry("CROSSBOW", "🏹 "),
-            java.util.Map.entry("NETHERITE_AXE", "🪓 "),
-            java.util.Map.entry("DIAMOND_AXE", "🪓 "),
-            java.util.Map.entry("IRON_AXE", "🪓 "),
-            java.util.Map.entry("STONE_AXE", "🪓 "),
-            java.util.Map.entry("WOODEN_AXE", "🪓 "),
-            java.util.Map.entry("GOLDEN_AXE", "🪓 "),
-            java.util.Map.entry("AIR", "👊 "),
-            java.util.Map.entry("DEFAULT", "")
-        );
-    }
-
-    @ConfigSerializable
-    public static class MobFormatGroup {
-        @Comment("Templates used when the mob is holding an item")
-        public java.util.List<String> weapon;
-
-        @Comment("Templates used when the mob is unarmed")
-        public java.util.List<String> unarmed;
-
-        public MobFormatGroup() {}
-
-        public MobFormatGroup(java.util.List<String> weapon, java.util.List<String> unarmed) {
-            this.weapon = weapon;
-            this.unarmed = unarmed;
-        }
-    }
-
-    @ConfigSerializable
-    public static class DeathEffects {
-        @Comment("Lightning effect settings")
-        public LightningSettings lightning = new LightningSettings();
-
-        @Comment("Sound effect settings")
-        public SoundSettings sound = new SoundSettings();
-    }
-
-    @ConfigSerializable
-    public static class LightningSettings {
-        @Comment("Enable client-side lightning strike effect")
-        public boolean enabled = true;
-
-        @Comment("Whom the effect is visible to. Options: KILLER_AND_VICTIM, RADIUS")
-        public String rangeMode = "KILLER_AND_VICTIM";
-
-        @Comment("Radius in blocks to show the effect if rangeMode is RADIUS")
-        public double radius = 32.0;
-    }
-
-    @ConfigSerializable
-    public static class SoundSettings {
-        @Comment("Enable custom sound effect on death")
-        public boolean enabled = true;
-
-        @Comment("The Bukkit Sound enum name to play (e.g. ENTITY_WITHER_SPAWN, ENTITY_LIGHTNING_BOLT_THUNDER). " +
-                 "Valid sounds: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Sound.html")
-        public String type = "ENTITY_LIGHTNING_BOLT_THUNDER";
-
-        @Comment("Whom the sound is audible to. Options: KILLER_AND_VICTIM, RADIUS")
-        public String rangeMode = "KILLER_AND_VICTIM";
-
-        @Comment("Radius in blocks to play the sound if rangeMode is RADIUS")
-        public double radius = 32.0;
-
-        @Comment("Sound volume")
-        public float volume = 1.0f;
-
-        @Comment("Sound pitch")
-        public float pitch = 1.0f;
-    }
-
-    @ConfigSerializable
-    public static class StreakSound {
-        @Comment("Enable this sound effect")
-        public boolean enabled = true;
-
-        @Comment("The Bukkit Sound enum name to play (e.g. ENTITY_PLAYER_LEVELUP, ENTITY_LIGHTNING_BOLT_THUNDER). " +
-                 "Valid sounds: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Sound.html")
-        public String type = "";
-
-        @Comment("Sound volume")
-        public float volume = 1.0f;
-
-        @Comment("Sound pitch")
-        public float pitch = 1.0f;
-
-        public StreakSound() {}
-
-        public StreakSound(boolean enabled, String type, float volume, float pitch) {
-            this.enabled = enabled;
-            this.type = type;
-            this.volume = volume;
-            this.pitch = pitch;
-        }
     }
 }
