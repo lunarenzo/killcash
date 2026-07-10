@@ -54,7 +54,7 @@ public final class ConfigMigrator {
             try {
                 YamlConfigurationLoader sourceLoader = YamlConfigurationLoader.builder().path(sourcePath).build();
                 CommentedConfigurationNode sourceRoot = sourceLoader.load();
-                if (sourceRoot == null || sourceRoot.isEmpty()) {
+                if (sourceRoot == null || sourceRoot.isNull()) {
                     continue;
                 }
 
