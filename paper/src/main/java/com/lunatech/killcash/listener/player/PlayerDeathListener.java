@@ -21,6 +21,10 @@ public class PlayerDeathListener implements Listener {
         Player victim = event.getEntity();
         Player killer = victim.getKiller();
 
+        if (killer == null) {
+            killer = com.lunatech.killcash.hook.PvPManagerHook.getCombatOpponent(victim);
+        }
+
         // Ensure there is a killer and it's not a self-kill (suicide)
         if (killer != null && !killer.getUniqueId().equals(victim.getUniqueId())) {
             killRewardService.processKill(killer, victim);

@@ -42,6 +42,10 @@ public final class DeathMessageListener implements Listener {
         Player victim = event.getEntity();
         Player killer = victim.getKiller();
 
+        if (killer == null) {
+            killer = com.lunatech.killcash.hook.PvPManagerHook.getCombatOpponent(victim);
+        }
+
         Component finalMessage;
 
         EntityDamageEvent lastDamage = victim.getLastDamageCause();
