@@ -1,4 +1,21 @@
-# KillCash
+<div align="center">
+  <img src="docs/assets/killcash_banner_header.png" alt="KillCash Header Banner" width="100%">
+
+  <br>
+
+  <a href="https://github.com/lunarenzo/killcash/releases">
+    <img alt="GitHub Release" src="https://img.shields.io/github/v/release/lunarenzo/killcash?style=for-the-badge&label=VERSION&labelColor=141417&color=2196F3">
+  </a>
+  <img alt="Minecraft Version" src="https://img.shields.io/badge/MINECRAFT-1.20%20--%201.21.x-009639?style=for-the-badge&logo=minecraft&logoColor=white&labelColor=141417">
+  <img alt="Java Version" src="https://img.shields.io/badge/JAVA-21%2B-E76F00?style=for-the-badge&logo=openjdk&logoColor=white&labelColor=141417">
+  <img alt="Platforms" src="https://img.shields.io/badge/PLATFORM-PAPER%20%7C%20FOLIA-1F8ACB?style=for-the-badge&labelColor=141417">
+  <img alt="CI/CD Status" src="https://img.shields.io/github/actions/workflow/status/lunarenzo/killcash/ci.yml?style=for-the-badge&labelColor=141417">
+  <a href="LICENSE">
+    <img alt="License" src="https://img.shields.io/github/license/lunarenzo/killcash?style=for-the-badge&color=blue&labelColor=141417">
+  </a>
+</div>
+
+---
 
 KillCash is a high-performance Paper/Spigot Minecraft plugin designed to reward players with custom economy cash when they defeat other players in PVP combat. Built on a modern multi-module architecture, it is designed for speed, flexibility, and extensibility, offering database synchronization for multi-server networks and a robust developer API.
 
@@ -15,6 +32,8 @@ KillCash is a high-performance Paper/Spigot Minecraft plugin designed to reward 
 ---
 
 ## 🌟 Key Features
+
+<img src="docs/assets/killcash_banner_feature.png" alt="KillCash Features Banner" width="100%">
 
 * **PVP Cash Rewards:** Configurable minimum and maximum payout ranges. Includes a `wholeNumberOnly` option to keep base rewards and calculated multipliers rounded mathematically.
 * **Cash Multipliers:**
