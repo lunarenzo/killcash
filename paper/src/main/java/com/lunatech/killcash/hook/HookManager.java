@@ -76,16 +76,22 @@ public class HookManager implements Reloadable {
     @Override
     public void onEnable(AbstractKillCash plugin) {
         var config = plugin.getConfigHandler().getConfig();
-        String backend = config != null && config.storage != null ? config.storage.backend : "PDC";
-        
-        if ("DATABASE".equalsIgnoreCase(backend) || "SQLITE".equalsIgnoreCase(backend) || "MYSQL".equalsIgnoreCase(backend)) {
-            var cachedSql = new com.lunatech.killcash.hook.impl.CachedSqlEconomyProvider(plugin);
-            cachedSql.start();
-            this.activeEconomyProvider = cachedSql;
-            Logger.get().info(ColorParser.of("<green>Using DATABASE (SQL Cache) storage backend for player balances.</green>").build());
+        boolean economyEnabled = config == null || config.economy == null || config.economy.enabled;
+
+        if (!economyEnabled) {
+            this.activeEconomyProvider = new com.lunatech.killcash.hook.impl.NoOpEconomyHook();
+            Logger.get().info(ColorParser.of("<yellow>Economy system is disabled. Using No-Op Economy Hook.</yellow>").build());
         } else {
-            this.activeEconomyProvider = new com.lunatech.killcash.hook.impl.PdcEconomyProvider(plugin);
-            Logger.get().info(ColorParser.of("<green>Using PDC (player NBT) storage backend for player balances.</green>").build());
+            String backend = config != null && config.storage != null ? config.storage.backend : "PDC";
+            if ("DATABASE".equalsIgnoreCase(backend) || "SQLITE".equalsIgnoreCase(backend) || "MYSQL".equalsIgnoreCase(backend)) {
+                var cachedSql = new com.lunatech.killcash.hook.impl.CachedSqlEconomyProvider(plugin);
+                cachedSql.start();
+                this.activeEconomyProvider = cachedSql;
+                Logger.get().info(ColorParser.of("<green>Using DATABASE (SQL Cache) storage backend for player balances.</green>").build());
+            } else {
+                this.activeEconomyProvider = new com.lunatech.killcash.hook.impl.PdcEconomyProvider(plugin);
+                Logger.get().info(ColorParser.of("<green>Using PDC (player NBT) storage backend for player balances.</green>").build());
+            }
         }
 
         // Register economy provider event listener if applicable

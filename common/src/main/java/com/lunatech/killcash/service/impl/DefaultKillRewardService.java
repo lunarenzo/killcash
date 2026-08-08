@@ -300,41 +300,60 @@ public class DefaultKillRewardService implements KillRewardService, Reloadable {
             cooldownCache.recordKill(killer.getUniqueId(), victim.getUniqueId(), settings.antiAbuse.killCooldown);
         }
 
-        // Perform economy operations asynchronously off-thread to avoid blocking tick speed
-        double finalShutdownBonus = shutdownBonus;
-        int finalNewStreak = newStreak;
-        int finalVictimStreak = victimStreak;
-        Scheduler.async(() -> {
-            boolean success = economyProviderSupplier.get().deposit(killer, finalReward);
-            if (success) {
-                // Dispatch message back to player's thread context
-                Scheduler.sync(() -> {
-                    if (killer.isOnline()) {
-                        messageService.sendMessage(killer, "pvp.reward-received", Map.of(
-                                "amount", String.format("%.2f", finalReward),
-                                "victim", victim.getName()
-                        ));
+        // Perform economy operations if enabled
+        if (configHandler.getConfig().economy.enabled) {
+            double finalShutdownBonus = shutdownBonus;
+            int finalNewStreak = newStreak;
+            int finalVictimStreak = victimStreak;
+            Scheduler.async(() -> {
+                boolean success = economyProviderSupplier.get().deposit(killer, finalReward);
+                if (success) {
+                    // Dispatch message back to player's thread context
+                    Scheduler.sync(() -> {
+                        if (killer.isOnline()) {
+                            messageService.sendMessage(killer, "pvp.reward-received", Map.of(
+                                    "amount", String.format("%.2f", finalReward),
+                                    "victim", victim.getName()
+                            ));
 
-                        if (killstreakEnabled) {
-                            // Notify killer of their current streak
-                            if (settings.killstreakSettings.showStreakChat) {
-                                messageService.sendMessage(killer, "pvp.streak-active", Map.of("streak", String.valueOf(finalNewStreak)));
-                            }
+                            if (killstreakEnabled) {
+                                // Notify killer of their current streak
+                                if (settings.killstreakSettings.showStreakChat) {
+                                    messageService.sendMessage(killer, "pvp.streak-active", Map.of("streak", String.valueOf(finalNewStreak)));
+                                }
 
-                            if (finalShutdownBonus > 0) {
-                                messageService.broadcast("pvp.shutdown", Map.of(
-                                    "killer", killer.getName(),
-                                    "player", killer.getName(),
-                                    "victim", victim.getName(),
-                                    "streak", String.valueOf(finalVictimStreak),
-                                    "bonus", String.format("%.2f", finalShutdownBonus)
-                                ));
+                                if (finalShutdownBonus > 0) {
+                                    messageService.broadcast("pvp.shutdown", Map.of(
+                                        "killer", killer.getName(),
+                                        "player", killer.getName(),
+                                        "victim", victim.getName(),
+                                        "streak", String.valueOf(finalVictimStreak),
+                                        "bonus", String.format("%.2f", finalShutdownBonus)
+                                    ));
+                                }
                             }
                         }
-                    }
-                }).execute();
+                    }).execute();
+                }
+            }).execute();
+        } else {
+            // Economy disabled: Skip deposits but still handle streaks and announcements
+            if (killstreakEnabled) {
+                if (settings.killstreakSettings.showStreakChat) {
+                    messageService.sendMessage(killer, "pvp.streak-active", Map.of("streak", String.valueOf(newStreak)));
+                }
+
+                if (shutdownBonus > 0) {
+                    messageService.broadcast("pvp.shutdown", Map.of(
+                        "killer", killer.getName(),
+                        "player", killer.getName(),
+                        "victim", victim.getName(),
+                        "streak", String.valueOf(victimStreak),
+                        "bonus", "0.00"
+                    ));
+                }
             }
-        }).execute();
+        }
     }
 
     private void handleDeathEffects(Player killer, Player victim, DeathEffectsConfig effects) {

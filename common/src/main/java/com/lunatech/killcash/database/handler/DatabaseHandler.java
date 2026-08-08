@@ -60,6 +60,10 @@ public final class DatabaseHandler extends AbstractService implements Reloadable
      */
     @Override
     public void onLoad(AbstractKillCash plugin) {
+        if (!plugin.getConfigHandler().getConfig().economy.enabled) {
+            return;
+        }
+
         if (config == null)
             config = DatabaseConfig.fromConfig(plugin.getConfigHandler().getDatabaseConfig(), plugin.getDataPath().resolve("database"));
 

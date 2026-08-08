@@ -100,14 +100,16 @@ public class KillCash extends AbstractKillCash {
         for (Reloadable handler : handlers)
             handler.onEnable(instance);
 
-        if (!DB.isStarted()) {
-            Logger.get().warn(ColorParser.of("<yellow>Database handler failed to start. Database support has been disabled.").build());
-            Bukkit.getPluginManager().disablePlugin(this);
-        }
+        if (configHandler.getConfig().economy.enabled) {
+            if (!DB.isStarted()) {
+                Logger.get().warn(ColorParser.of("<yellow>Database handler failed to start. Database support has been disabled.").build());
+                Bukkit.getPluginManager().disablePlugin(this);
+            }
 
-        if (!Messaging.isReady() && configHandler.getDatabaseConfig().messaging.enabled) {
-            Logger.get().warn(ColorParser.of("<yellow>Messaging handler failed to start. Messaging support has been disabled.").build());
-            Bukkit.getPluginManager().disablePlugin(this);
+            if (!Messaging.isReady() && configHandler.getDatabaseConfig().messaging.enabled) {
+                Logger.get().warn(ColorParser.of("<yellow>Messaging handler failed to start. Messaging support has been disabled.").build());
+                Bukkit.getPluginManager().disablePlugin(this);
+            }
         }
     }
 

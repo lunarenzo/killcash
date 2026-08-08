@@ -82,6 +82,10 @@ public final class MessagingHandler extends AbstractService implements Reloadabl
 
     @Override
     public void onLoad(AbstractKillCash plugin) {
+        if (!plugin.getConfigHandler().getConfig().economy.enabled) {
+            return;
+        }
+
         if (config == null)
             this.config = MessagingConfig.fromConfig(plugin.getConfigHandler().getDatabaseConfig());
 

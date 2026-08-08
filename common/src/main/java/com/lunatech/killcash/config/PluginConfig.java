@@ -94,4 +94,17 @@ public class PluginConfig implements VersionedConfig {
         @Comment("The storage backend to use for balances. Options: PDC, DATABASE.")
         public String backend = "PDC";
     }
+
+    @Comment("""
+        ECONOMY SETTINGS
+        ================
+        Enable or disable the entire economy/tokens feature.
+        """)
+    public EconomySettings economy = new EconomySettings();
+
+    @ConfigSerializable
+    public static class EconomySettings {
+        @Comment("Whether the economy feature is enabled.")
+        public boolean enabled = true;
+    }
 }

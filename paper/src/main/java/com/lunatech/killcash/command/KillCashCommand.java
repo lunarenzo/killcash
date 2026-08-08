@@ -35,10 +35,12 @@ final class KillCashCommand extends Command {
 
     @Override
     public CommandAPICommand command() {
-        return new CommandAPICommand("killcash")
+        var base = new CommandAPICommand("killcash")
             .withHelp("Base KillCash command.", "Base KillCash command.")
-            .withPermission(BASE_PERM)
-            .withSubcommands(
+            .withPermission(BASE_PERM);
+
+        if (plugin.getConfigHandler().getConfig().economy.enabled) {
+            base.withSubcommands(
                 commandStats(),
                 commandBalance(),
                 commandPay(),
@@ -51,12 +53,22 @@ final class KillCashCommand extends Command {
                 commandReloadLang(),
                 commandReloadAll(),
                 commandHelp()
-            )
-            .executes(this::executorKillCash);
+            );
+        } else {
+            base.withSubcommands(
+                commandReload(),
+                commandReloadConfig(),
+                commandReloadLang(),
+                commandReloadAll(),
+                commandHelp()
+            );
+        }
+
+        return base.executes(this::executorKillCash);
     }
 
     private void executorKillCash(CommandSender sender, CommandArguments args) {
-        if (sender instanceof Player player) {
+        if (plugin.getConfigHandler().getConfig().economy.enabled && sender instanceof Player player) {
             showStats(player, player);
         } else {
             sender.sendMessage(Translation.as("commands.killcash.help"));
