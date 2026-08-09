@@ -42,7 +42,11 @@ public class PaperMessageService implements MessageService {
         for (Map.Entry<String, String> entry : placeholders.entrySet()) {
             parser.with(entry.getKey(), entry.getValue());
         }
-        org.bukkit.Bukkit.broadcast(parser.build());
+        net.kyori.adventure.text.Component msg = parser.build();
+        for (Player p : org.bukkit.Bukkit.getOnlinePlayers()) {
+            p.sendMessage(msg);
+        }
+        org.bukkit.Bukkit.getConsoleSender().sendMessage(msg);
     }
 
     @Override
@@ -51,7 +55,11 @@ public class PaperMessageService implements MessageService {
         for (Map.Entry<String, String> entry : placeholders.entrySet()) {
             parser.with(entry.getKey(), entry.getValue());
         }
-        org.bukkit.Bukkit.broadcast(parser.build());
+        net.kyori.adventure.text.Component msg = parser.build();
+        for (Player p : org.bukkit.Bukkit.getOnlinePlayers()) {
+            p.sendMessage(msg);
+        }
+        org.bukkit.Bukkit.getConsoleSender().sendMessage(msg);
     }
 
     @Override
